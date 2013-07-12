@@ -1,0 +1,3 @@
+gcc34 -o IsmpSpEngine IsmpSpEngine.c soapC.c soapServer.c ../../../gsoap-2.7/gsoap/stdsoap2.c  ../pub/pubfunc.c -lgsoap -lccl -D DEBUG
+cp IsmpSpEngine ../../bin -f
+

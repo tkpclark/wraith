@@ -1,0 +1,2 @@
+gcc34 -o SmsNotification SmsNotification.c soapC.c soapServer.c  ../../../../gsoap-2.7/gsoap/stdsoap2.c ../../pub/pubfunc.c -lgsoap -lccl -DDEBUG
+cp SmsNotification ../../../bin -f
