@@ -1,15 +1,15 @@
-#define _FILE_OFFSET_BITS 64
+//#define _FILE_OFFSET_BITS 64
 #include "soapH.h"
 #include "SmsNotificationBinding.nsmap"
-#include <ccl/ccl.h>
+//#include <ccl/ccl.h>
 //#include "apache_gsoap.h"
 //IMPLEMENT_GSOAP_SERVER()
 
-char logbuf[1024];
-char mdname[32];
-static char logfile[128];
-static char heapfile[128];
-int logfd;
+//char logbuf[1024];
+char mdname[]="SmsNotification";
+char logpath[] = "/home/app/logs";
+char version[]="1.00";
+
 /*
 static void read_config()
 {
@@ -34,33 +34,26 @@ static void read_config()
 
 static void my_init()
 {
-	//read_config();
-	logfd=open(logfile,O_WRONLY|O_APPEND);
-	if(logfd==-1)
-	{
-		printf("open logfile error!\n");
-		exit(0);
-	}
-	
-	//proclog(logfd,"starting...");
+
 }
 int __ns1__notifySmsDeliveryReceipt(struct soap *soap, struct ns2__notifySmsDeliveryReceipt *ns2__notifySmsDeliveryReceipt, struct ns2__notifySmsDeliveryReceiptResponse* ns2__notifySmsDeliveryReceiptResponse)
 {
-	sprintf(logbuf,"[notifySmsDeliveryReceipt]corr[%s]status[%d]",ns2__notifySmsDeliveryReceipt->correlator,ns2__notifySmsDeliveryReceipt->deliveryStatus->deliveryStatus);
-	proclog(logfd,logbuf);
+	proclog("[notifySmsDeliveryReceipt]corr[%s]status[%d]",ns2__notifySmsDeliveryReceipt->correlator,ns2__notifySmsDeliveryReceipt->deliveryStatus->deliveryStatus);
+
 	//writing heapfile
+	/*
 	int fd;
 	fd=open(heapfile,O_WRONLY|O_APPEND);
 	if(fd==-1)
 	{
-		proclog(logfd,"open heapfile error!\n");
+		proclog("open heapfile error!\n");
 		exit(0);
 	}
 	
-	/*
-	corr 2
-	status 30
-	*/
+
+	//corr 2
+	//status 30
+
 	char buf[256];
 	strcpy(buf,"3");
 	strcpy(buf+2,ns2__notifySmsDeliveryReceipt->correlator);
@@ -71,45 +64,46 @@ int __ns1__notifySmsDeliveryReceipt(struct soap *soap, struct ns2__notifySmsDeli
 	write(fd,buf,sizeof(buf));
 	close(fd);
 	
-	
+	*/
 	return SOAP_OK;
 }
  
 int __ns1__notifySmsReception(struct soap *soap, struct ns2__notifySmsReception *ns2__notifySmsReception, struct ns2__notifySmsReceptionResponse* ns2__notifySmsReceptionResponse)
 {
-	
+
 	//printf("1:%s\n",soap->header->ns4__NotifySOAPHeader->spId);
 	//printf("2:%s\n",ns2__notifySmsReception->message->message);
 	char gbcontent[512];
 	memset(gbcontent,0,sizeof(gbcontent));
 	to_gb(ns2__notifySmsReception->message->message,gbcontent);
 	
-	sprintf(logbuf,"[Reception]regId[%s]message[%s]sender[%s]servnumber[%s]linkid[%s]",
+	proclog("[Reception]regId[%s]message[%s]sender[%s]servnumber[%s]linkid[%s]",
 								ns2__notifySmsReception->registrationIdentifier,
 								gbcontent,
 								//ns2__notifySmsReception->message->message,
 								ns2__notifySmsReception->message->senderAddress,
 								ns2__notifySmsReception->message->smsServiceActivationNumber,
 								soap->header->ns4__NotifySOAPHeader->linkId);
-	proclog(logfd,logbuf);
 	
 	
+
 //writing heapfile
+	/*
 	int fd;
 	fd=open(heapfile,O_WRONLY|O_APPEND);
 	if(fd==-1)
 	{
-		proclog(logfd,"open heapfile error!\n");
+		proclog("open heapfile error!\n");
 		exit(0);
 	}
 	
-	/*
-	regID 2
-	message 30 
-	sender 180
-	servnumber 200
-	linkid 220
-	*/
+
+//	regID 2
+//	message 30
+//	sender 180
+//	servnumber 200
+//	linkid 220
+
 	char buf[256];
 	strcpy(buf,"1");
 	if(ns2__notifySmsReception->registrationIdentifier)
@@ -128,7 +122,7 @@ int __ns1__notifySmsReception(struct soap *soap, struct ns2__notifySmsReception 
 	close(fd);
 	
 	
-
+*/
 
 	return SOAP_OK;
 }
