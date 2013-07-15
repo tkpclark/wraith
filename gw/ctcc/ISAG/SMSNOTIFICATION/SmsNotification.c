@@ -1,7 +1,8 @@
 //#define _FILE_OFFSET_BITS 64
 #include "soapH.h"
 #include "SmsNotificationBinding.nsmap"
-//#include <ccl/ccl.h>
+#include <ccl/ccl.h>
+#include "mysqllib.h"
 //#include "apache_gsoap.h"
 //IMPLEMENT_GSOAP_SERVER()
 
@@ -10,7 +11,15 @@ char mdname[]="SmsNotification";
 char logpath[] = "/home/app/logs";
 char version[]="1.00";
 
-/*
+static char ip[32];
+static char port[8];
+static char db[32];
+static char user[32];
+static char pass[32];
+static char gwid[4];
+
+static MYSQL mysql;
+
 static void read_config()
 {
 	struct ccl_t config;
@@ -18,23 +27,31 @@ static void read_config()
 	config.comment_char = '#';
 	config.sep_char = '=';
 	config.str_char = '"';
-	ccl_parse(&config, "../conf/SmsNotification.ccl");
+	ccl_parse(&config, "/home/app/wraith/src/gw/ctcc/conf/config.ccl");
 	while((iter = ccl_iterate(&config)) != 0)
 	{
-		if(!strcmp(iter->key,"logfile"))
-			strcpy(logfile,iter->value);
-		else if(!strcmp(iter->key,"mdname"))
-			strcpy(mdname,iter->value);
-		else if(!strcmp(iter->key,"heapfile"))
-			strcpy(heapfile,iter->value);
+		if(!strcmp(iter->key,"ip"))
+			strcpy(ip,iter->value);
+		else if(!strcmp(iter->key,"db"))
+			strcpy(db,iter->value);
+		else if(!strcmp(iter->key,"user"))
+			strcpy(user,iter->value);
+		else if(!strcmp(iter->key,"pass"))
+			strcpy(pass,iter->value);
+		else if(!strcmp(iter->key,"gwid"))
+			strcpy(gwid,iter->value);
+
 	}
 	ccl_release(&config);
+
+	//proclog("[%s][%s][%s][%s][%s]",ip,db,user,pass,gwid);
 }
-*/
+
 
 static void my_init()
 {
-
+	read_config();
+	mysql_create_connect(&mysql, ip, user,pass,db);
 }
 int __ns1__notifySmsDeliveryReceipt(struct soap *soap, struct ns2__notifySmsDeliveryReceipt *ns2__notifySmsDeliveryReceipt, struct ns2__notifySmsDeliveryReceiptResponse* ns2__notifySmsDeliveryReceiptResponse)
 {
@@ -78,14 +95,25 @@ int __ns1__notifySmsReception(struct soap *soap, struct ns2__notifySmsReception 
 	to_gb(ns2__notifySmsReception->message->message,gbcontent);
 	
 	proclog("[Reception]regId[%s]message[%s]sender[%s]servnumber[%s]linkid[%s]",
-								ns2__notifySmsReception->registrationIdentifier,
-								gbcontent,
-								//ns2__notifySmsReception->message->message,
-								ns2__notifySmsReception->message->senderAddress,
-								ns2__notifySmsReception->message->smsServiceActivationNumber,
-								soap->header->ns4__NotifySOAPHeader->linkId);
+			ns2__notifySmsReception->registrationIdentifier,
+			gbcontent,
+			//ns2__notifySmsReception->message->message,
+			ns2__notifySmsReception->message->senderAddress,
+			ns2__notifySmsReception->message->smsServiceActivationNumber,
+			soap->header->ns4__NotifySOAPHeader->linkId);
+
 	
-	
+	char sql[512];
+	sprintf(sql,"insert into wraith_mo( in_date, phone_number, message, sp_number, linkid, gwid ) values (NOW(),'%s', '%s', '%s', '%s', '%s');",
+			ns2__notifySmsReception->message->senderAddress,
+			gbcontent,
+			ns2__notifySmsReception->message->smsServiceActivationNumber,
+			soap->header->ns4__NotifySOAPHeader->linkId,
+			gwid
+			);
+	mysql_get_data(&mysql, sql,data);
+
+
 
 //writing heapfile
 	/*
