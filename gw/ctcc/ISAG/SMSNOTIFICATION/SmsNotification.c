@@ -8,7 +8,7 @@
 
 //char logbuf[1024];
 char mdname[]="SmsNotification";
-char logpath[] = "/home/app/logs";
+char logpath[] = "/home/app/logs/ctccgw";
 char version[]="1.00";
 
 static char ip[32];
@@ -56,7 +56,13 @@ static void my_init()
 int __ns1__notifySmsDeliveryReceipt(struct soap *soap, struct ns2__notifySmsDeliveryReceipt *ns2__notifySmsDeliveryReceipt, struct ns2__notifySmsDeliveryReceiptResponse* ns2__notifySmsDeliveryReceiptResponse)
 {
 	proclog("[notifySmsDeliveryReceipt]corr[%s]status[%d]",ns2__notifySmsDeliveryReceipt->correlator,ns2__notifySmsDeliveryReceipt->deliveryStatus->deliveryStatus);
-
+	char sql[512];
+	sprintf(sql,"insert into wraith_mr( in_date, match_id, report, gwid ) values (NOW(),'%s', '%d', '%s');",
+			ns2__notifySmsDeliveryReceipt->correlator,
+			ns2__notifySmsDeliveryReceipt->deliveryStatus->deliveryStatus,
+			gwid
+			);
+	mysql_get_data(&mysql, sql,data);
 	//writing heapfile
 	/*
 	int fd;
