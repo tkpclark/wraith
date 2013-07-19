@@ -1,9 +1,5 @@
-gcc34 -o SendSms SendSms.c soapC.c soapClient.c ../../../../gsoap-2.7/gsoap/stdsoap2.c ../../pub/pubfunc.c  ../../pub/mysqlfunc.c -I /usr/local/mysql/include/ -L /usr/local/mysql/lib/ -lmysqlclient -lgsoap -lssl -lccl -DDEBUG 
+gcc -g -o SendSms SendSms.c soapC.c soapClient.c ../../pub/pubfunc.c ../../pub/mysqllib.c -I ../../pub/  -I/usr/include/mysql/ -L/usr/lib64/mysql -lmysqlclient -lgsoap -lssl -lccl -DDEBUG
+cp SendSms /home/app/wraith/bin/ -f
 
-
-gcc34 daemon.c ../../pub/pubfunc.c ../../pub/mysqlfunc.c -o SendSmsdaemon  -I /usr/local/mysql/include/ -L /usr/local/mysql/lib/ -lmysqlclient -lccl
-
-
-cp SendSms SendSmsdaemon ../../../bin -f
-
-
+gcc -g -o SendSmsDaemon daemon.c ../../pub/pubfunc.c ../../pub/mysqllib.c -I ../../pub/ -I/usr/include/mysql/ -L/usr/lib64/mysql -lmysqlclient -lccl
+cp SendSmsDaemon /home/app/wraith/bin/ -f

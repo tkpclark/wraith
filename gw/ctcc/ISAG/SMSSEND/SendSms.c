@@ -1,4 +1,6 @@
-#define _FILE_OFFSET_BITS 64
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/mman.h>
 #include <signal.h>
 #include <sys/shm.h>
@@ -13,9 +15,9 @@
 #include "SendSmsBinding.nsmap"
 
 	
-int logfd;
-char logbuf[1024];
-char mdname[16];
+char mdname[]="sendsms";
+char logpath[256];
+char version[]="1.00";
 static int quit;
 static int prtpid;
 static int rcdlen;
@@ -34,6 +36,8 @@ static char dbname[32];
 static char *p_map;
 static unsigned int mmapsize;
 
+char *init_mmap(char *pathname,unsigned int msize);
+
 static void acquit(int signo)
 {
 	quit=1;
@@ -45,8 +49,7 @@ static void gofulfil(int signo)
 }
 static void procquit(void)
 {
-  	proclog(logfd,"MESSAGE:quited!");
-  	close(logfd);
+  	proclog("MESSAGE:quited!");
 }
 static void read_config()
 {
@@ -55,15 +58,13 @@ static void read_config()
 	config.comment_char = '#';
 	config.sep_char = '=';
 	config.str_char = '"';
-	ccl_parse(&config, "SendSms.ccl");
+	ccl_parse(&config, "../conf/ctccgw.ccl");
 	while((iter = ccl_iterate(&config)) != 0)
 	{
-		if(!strcmp(iter->key,"mdname"))
-			strcpy(mdname,iter->value);       
-		else if(!strcmp(iter->key,"mmapfile"))
+		if(!strcmp(iter->key,"mmapfile"))
 			strcpy(mmapfile,iter->value);
-		else if(!strcmp(iter->key,"logfile"))
-			strcpy(logfile,iter->value);
+		else if(!strcmp(iter->key,"logpath"))
+			strcpy(logpath,iter->value);
 		else if(!strcmp(iter->key,"mmapsize"))
 			mmapsize=atoi(iter->value);
 		else if(!strcmp(iter->key,"rcdlen"))
@@ -75,13 +76,13 @@ static void read_config()
 		else if(!strcmp(iter->key,"key"))
 			strcpy(key,iter->value);
 			
-				else if(!strcmp(iter->key,"dbip"))
+		else if(!strcmp(iter->key,"ip"))
 			strcpy(dbip,iter->value);
-		else if(!strcmp(iter->key,"dbuser"))
+		else if(!strcmp(iter->key,"user"))
 			strcpy(dbuser,iter->value);
-		else if(!strcmp(iter->key,"dbpass"))
+		else if(!strcmp(iter->key,"pass"))
 			strcpy(dbpass,iter->value);
-		else if(!strcmp(iter->key,"dbname"))
+		else if(!strcmp(iter->key,"db"))
 			strcpy(dbname,iter->value);
 	}
 	ccl_release(&config);
@@ -188,7 +189,7 @@ static fulfil(char *p_data)
 			ns2__sendSms.receiptRequest=&receiptRequest;
 			
 			
-			sprintf(logbuf,"cor[%s]spid[%s]pwd[%s]ts[%s]tran[%s]san[%s]fa[%s]src[%s]dest[%s]pid[%s]linkid[%s]amount[%s]code[%s]msg[%s]",
+			proclog("cor[%s]spid[%s]pwd[%s]ts[%s]tran[%s]san[%s]fa[%s]src[%s]dest[%s]pid[%s]linkid[%s]amount[%s]code[%s]msg[%s]",
 											receiptRequest.correlator,
 											ns4_RequestSOAPHeader.spId,
 											ns4_RequestSOAPHeader.spPassword,
@@ -204,7 +205,7 @@ static fulfil(char *p_data)
 											charging.code,
 											p_data+46
 											);
-			proclog(logfd,logbuf);	
+
 			
 			soap_init(&soap);
 			soap.header = (struct SOAP_ENV__Header *)soap_malloc(&soap, sizeof(struct SOAP_ENV__Header));
@@ -223,11 +224,11 @@ static fulfil(char *p_data)
 			
 			//update result
 			char sql[256];
-			sprintf(sql,"update mt set resp='%s',issent=1 where ID='%s'",
+			proclog("update mt set resp='%s',issent=1 where ID='%s'",
 										ns2__sendSmsResponse.result,
 										receiptRequest.correlator
 										);
-				proclog(logfd,sql);
+				proclog(sql);
 				mysql_exec(&mysql,sql);
 			
 			
@@ -260,15 +261,9 @@ main()
 		pause();
 	}
 	read_config();
-	sprintf(tmp,"|%d",getpid());
-	strcat(mdname,tmp);
-	logfd=open(logfile,O_WRONLY|O_APPEND);
-	if(logfd==-1)
-	{
-		proclog(logfd,"open log file error!\n");
-		kill(prtpid,SIGINT);
-		pause();
-	}
+	//sprintf(tmp,"|%d",getpid());
+	//strcat(mdname,tmp);
+
 
 	lockfd=open("tkp.lck",O_CREAT|O_WRONLY|O_TRUNC,S_IRWXU);
 	if(lockfd==-1)
@@ -297,14 +292,14 @@ main()
 	sigaction(SIGUSR1,&signew,0);
 	
 	mysql_init(&mysql);
-   if(!mysql_real_connect(&mysql,dbip,dbuser,dbpass,dbname,0,NULL,0))
-   {
-        sql_err_log(&mysql);
-        exit(0);
-   }
+	   if(!mysql_real_connect(&mysql,dbip,dbuser,dbpass,dbname,0,NULL,0))
+	   {
+		sql_err_log(&mysql);
+		exit(0);
+	   }
 	
 	
-	p_map=(char*)init_mmap(mmapfile,mmapsize);
+	p_map=init_mmap(mmapfile,mmapsize);
 	if(!p_map)
 	{
 		kill(prtpid,SIGINT);

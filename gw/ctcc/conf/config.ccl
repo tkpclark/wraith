@@ -9,7 +9,18 @@ pass="tengyewudi2012@)!@"
 gwid="1"
 
 
+mmapfile="../mmap/sendsms.mmap"
+logpath="../logs/ctccgw/"
 
+chdname="./SendSms"
+chdnum="3"
+mmapsize="10240000"
+rcdlen="256"
+
+spid="35100459"
+
+serverurl="http://118.85.200.55:9081/SendSmsService"
+key="kx2101"
 
 
 

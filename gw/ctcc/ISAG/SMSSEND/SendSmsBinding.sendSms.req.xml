@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope
- xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
- xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xmlns:xsd="http://www.w3.org/2001/XMLSchema"
- xmlns:ns2="http://www.chinatelecom.com.cn/schema/ctcc/sms/send/v2_1/local"
- xmlns:ns4="http://www.chinatelecom.com.cn/schema/ctcc/common/v2_1"
- xmlns:ns5="http://www.chinatelecom.com.cn/schema/ctcc/sms/v2_1"
- xmlns:ns1="http://www.chinatelecom.com.cn/wsdl/ctcc/sms/send/v2_1/service">
+  xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns2="http://www.chinatelecom.com.cn/schema/ctcc/sms/send/v2_1/local"
+  xmlns:ns4="http://www.chinatelecom.com.cn/schema/ctcc/common/v2_1"
+  xmlns:ns5="http://www.chinatelecom.com.cn/schema/ctcc/sms/v2_1"
+  xmlns:ns1="http://www.chinatelecom.com.cn/wsdl/ctcc/sms/send/v2_1/service">
  <SOAP-ENV:Header>
   <ns4:RequestSOAPHeader>
    <spId></spId>
@@ -25,21 +25,21 @@
  </SOAP-ENV:Header>
  <SOAP-ENV:Body>
    <ns2:sendSms>
-    <addresses></addresses>
-    <addresses></addresses>
-    <senderName></senderName>
-    <charging>
+    <ns2:addresses></ns2:addresses>
+    <ns2:addresses></ns2:addresses>
+    <ns2:senderName></ns2:senderName>
+    <ns2:charging>
      <description></description>
      <currency></currency>
      <amount></amount>
      <code></code>
-    </charging>
-    <message></message>
-    <receiptRequest>
+    </ns2:charging>
+    <ns2:message></ns2:message>
+    <ns2:receiptRequest>
      <endpoint></endpoint>
      <interfaceName></interfaceName>
      <correlator></correlator>
-    </receiptRequest>
+    </ns2:receiptRequest>
    </ns2:sendSms>
 
  </SOAP-ENV:Body>

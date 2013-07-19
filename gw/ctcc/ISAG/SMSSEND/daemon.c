@@ -1,4 +1,6 @@
-#define _FILE_OFFSET_BITS 64
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -10,13 +12,14 @@
 #include <sys/stat.h>
 #include <mysql.h>
 
-char logbuf[1024];
-char mdname[16];
+char mdname[]="daemon";
+char logpath[256];
+char version[]="1.00";
 static int rcdlen;
 static char chdname[64];
 static unsigned int mmapsize;
 static char mmapfile[128];
-static char logfile[128];
+
 
 static char dbip[16];
 static char dbuser[16];
@@ -25,7 +28,7 @@ static char dbname[32];
 
 static MYSQL mysql;
 
-int logfd;
+
 static int gstop=0;
 static int chdnum;
 
@@ -34,6 +37,8 @@ static char *p_map;
 static int *ppid;
 
 static const char *pidfile="pgid.pid";
+
+char *init_mmap(char *pathname,unsigned int msize);
 
 static create_children(char **argv)
 {
@@ -46,20 +51,19 @@ static create_children(char **argv)
 			pid=fork();
 			if(pid<0)
 			{
-				proclog(logfd,"ERROR:fork error!");
+				proclog("ERROR:fork error!");
 				exit(0);
 			}
 			else if(!pid)//child
 			{
 				if(execv(chdname,argv)==-1)
-					proclog(logfd,"ERROR:exec error!");
+					proclog("ERROR:exec error!");
 				exit(0);
 			}
 			else
 			{
 				*(ppid+i)=pid;
-				sprintf(logbuf,"MESSAGE:created child [%d]",pid);
-				proclog(logfd,logbuf);
+				proclog("MESSAGE:created child [%d]",pid);
 			}
 		}
 }
@@ -74,13 +78,13 @@ static int check_children_state()//return the number of dead children
 		if(n>0)
 		{
 			//sprintf(logbuf,"%d quited ",*(ppid+i));
-			//proclog(logfd,logbuf);
+			//proclog(logbuf);
 			*(ppid+i)=0;
 			num++;
 		}
 		else if(n==-1)
 		{
-			proclog(logfd,"ERROR:waitpid error!");
+			proclog("ERROR:waitpid error!");
 			exit(0);
 		}
 		else ;
@@ -90,17 +94,16 @@ static int check_children_state()//return the number of dead children
 static void acquit(int signo)
 {
 	gstop=1;
-	//proclog(logfd,"got quiting signal");
+	//proclog("got quiting signal");
 }
 static void wakeup(int signo)
 {
-	;//proclog(logfd,"get data from heapfile");
+	;//proclog("get data from heapfile");
 }
 static void procquit(void)
 {
  	unlink(pidfile);
-  	proclog(logfd,"MESSAGE:group quited!");
-  	close(logfd);
+  	proclog("MESSAGE:group quited!");
 }
 static kill_children(int sig)
 {
@@ -114,7 +117,7 @@ static kill_children(int sig)
 static wait_to_quit()
 {
 	int i;
-	proclog(logfd,"MESSAGE:waiting all children to quit");
+	proclog("MESSAGE:waiting all children to quit");
 	kill_children(SIGINT);
 	while(1)
 	{
@@ -125,7 +128,7 @@ static wait_to_quit()
 		}
 		else
 		{
-			proclog(logfd,"MESSAGE:still waiting");
+			proclog("MESSAGE:still waiting");
 			sleep(1);
 		}
 	}
@@ -143,17 +146,17 @@ static int fetch_data()
 	memset(p_map+4,0,mmapsize-4);
 	//lseek(heapfd,rcdlen*( (off_t)(*(unsigned int*)p_map) ),SEEK_SET);
 	//	sprintf(logbuf,"fetch from %d \n",rcdlen*( (off_t)(*(unsigned int*)p_map) ) );
-	//	proclog(logfd,logbuf);
+	//	proclog(logbuf);
 	char sql[256];
 	strcpy(sql,"set names gbk");
 	mysql_exec(&mysql,sql);
-	sprintf(sql,"select * from mt where ID > %d limit 500",(off_t)(*(unsigned int*)p_map));
-	//proclog(logfd,sql);
+	sprintf(sql,"select * from wraith_mt where ID > %d limit 500",(off_t)(*(unsigned int*)p_map));
+	//proclog(sql);
 	mysql_exec(&mysql,sql);
 	result=mysql_store_result(&mysql);
 	gotnum=mysql_num_rows(result);
 //	sprintf(logbuf,"got [%d] rows",gotnum);
-//	proclog(logfd,logbuf);
+//	proclog(logbuf);
 	
 	int i=0;
 	while(row=mysql_fetch_row(result))
@@ -164,19 +167,19 @@ static int fetch_data()
 			*(int*)(tmp+252)=atol(row[0]);
 		
 		if(row[1]!=NULL)//address
-			strcpy(tmp+196,row[1]);
+			strcpy(tmp+196,row[3]);
 		
 		if(row[2]!=NULL)//senderName
 			strcpy(tmp+26,row[2]);
 		
 		if(row[3]!=NULL)//message
-			strcpy(tmp+46,row[3]);
+			strcpy(tmp+46,row[8]);
 			
 		if(row[4]!=NULL)//productID
-			strcpy(tmp,row[4]);
+			strcpy(tmp,row[7]);
 			
 		if(row[5]!=NULL)//linkID
-			strcpy(tmp+231,row[5]);
+			strcpy(tmp+231,row[4]);
 			
 		if(row[6]!=NULL)//amount==feecode
 			strcpy(tmp+221,row[6]);
@@ -198,18 +201,16 @@ static void read_config()
 	config.comment_char = '#';
 	config.sep_char = '=';
 	config.str_char = '"';
-	ccl_parse(&config, "../conf/SendSms.ccl");
+	ccl_parse(&config, "../conf/ctccgw.ccl");
 	while((iter = ccl_iterate(&config)) != 0)
 	{
 
-		if(!strcmp(iter->key,"mdname"))
-			strcpy(mdname,iter->value);       
-		else if(!strcmp(iter->key,"chdnum"))
+		if(!strcmp(iter->key,"chdnum"))
 			chdnum=atoi(iter->value);
 		else if(!strcmp(iter->key,"mmapfile"))
 			strcpy(mmapfile,iter->value);
-		else if(!strcmp(iter->key,"logfile"))
-			strcpy(logfile,iter->value);
+		else if(!strcmp(iter->key,"logpath"))
+			strcpy(logpath,iter->value);
 		else if(!strcmp(iter->key,"chdname"))
 			strcpy(chdname,iter->value);
 		else if(!strcmp(iter->key,"mmapsize"))
@@ -217,13 +218,13 @@ static void read_config()
 		else if(!strcmp(iter->key,"rcdlen"))
 			rcdlen=atoi(iter->value);
 			
-		else if(!strcmp(iter->key,"dbip"))
+		else if(!strcmp(iter->key,"ip"))
 			strcpy(dbip,iter->value);
-		else if(!strcmp(iter->key,"dbuser"))
+		else if(!strcmp(iter->key,"user"))
 			strcpy(dbuser,iter->value);
-		else if(!strcmp(iter->key,"dbpass"))
+		else if(!strcmp(iter->key,"pass"))
 			strcpy(dbpass,iter->value);
-		else if(!strcmp(iter->key,"dbname"))
+		else if(!strcmp(iter->key,"db"))
 			strcpy(dbname,iter->value);
 	}
 	ccl_release(&config);
@@ -240,14 +241,9 @@ static daemain(int argc,char **argv)
 	}
 	read_config();
 	//printf("\nmdname=%s\nmmapfile=%s\nchdname=%s\nchdnum=%d\nmmapsize=%d\nrcdlen=%d\n",mdname,mmapfile,chdnum,mmapsize,rcdlen);
-	logfd=open(logfile,O_WRONLY|O_APPEND);
-	if(logfd<0)
-	{
-		printf("open [%s] error!\n",logfile);
-		exit(0);
-	}
 
-	proclog(logfd,"MESSAGE:starting....");
+
+	proclog("MESSAGE:starting....");
 	signew.sa_handler=acquit;
 	sigemptyset(&signew.sa_mask);
 	signew.sa_flags=0;
@@ -272,7 +268,7 @@ static daemain(int argc,char **argv)
    }
 	
 	
-	p_map=(char*)init_mmap(mmapfile,mmapsize);
+	p_map=init_mmap(mmapfile,mmapsize);
 	if(!p_map)
 		exit(0);
 	memset(p_map+4,0,mmapsize-4);
@@ -283,7 +279,7 @@ static daemain(int argc,char **argv)
 		*(ppid+i)=0;
 	}
 	create_children(argv);
-	proclog(logfd,"MESSAGE:all children created!");
+	proclog("MESSAGE:all children created!");
 	sleep(1);//very important..wait children created
 	while(11)
 	{
@@ -303,7 +299,7 @@ static daemain(int argc,char **argv)
 		if(check_children_state())
 			create_children(argv);
 		sleep(10);//quit/fetch data/create child/
-		//proclog(logfd,"sleeping");
+		//proclog("sleeping");
 	}
 }
 

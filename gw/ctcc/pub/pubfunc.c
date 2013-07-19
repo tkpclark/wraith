@@ -46,7 +46,7 @@ void proclog(const char *fmt,...)
 	int fd;
 
 	//log content
-	sprintf(buf,"[%s][%s][%s]:%s\n",ts_nano,mdname,version,tmp);
+	sprintf(buf,"[%s][md:%s][ver:%s]: %s\n",ts_nano,mdname,version,tmp);
 	//printf("%s",buf);
 
 
@@ -112,4 +112,89 @@ void to_gb(char *in,char *out)
         }
         iconv(cd,&pout,&ll1,&putfout,&ll2);
         iconv_close(cd);
+}
+myflock(int lockfd,char type)
+{
+		if(type==1)
+		{
+	        if(flock(lockfd,LOCK_EX))
+	        {
+	        	proclog("lock error!\n");
+	            exit(0);
+	        }
+	        //proclog(logfd,"lock");
+	    }
+	    else if(type==2)
+	    {
+	    	if(flock(lockfd,LOCK_UN))
+	        {
+	        	proclog("unlock error!\n");
+	            exit(0);
+	        }
+	        //proclog(logfd,"unlock");
+	    }
+	    else;
+}
+char *init_mmap(char *pathname,unsigned int msize)
+{
+	int fd;
+	struct stat statbuf;
+	char *p_map=NULL;
+	fd=open(pathname,O_RDWR|O_CREAT,0600);
+	if(fd<0)
+	{
+		proclog("ERROR:open %s error!",pathname);
+		return NULL;
+	}
+	if (fstat(fd, &statbuf) < 0)
+	{
+		proclog("ERROR:fstat %s error\n",pathname);
+		return NULL;
+	}
+	if(statbuf.st_size!=msize)
+	{
+		void *p=NULL;
+		p=malloc(msize);
+		memset(p,0,msize);
+		write(fd,p,msize);
+	}
+	if ((p_map = mmap(0, msize, PROT_READ|PROT_WRITE, MAP_SHARED,fd, 0)) == MAP_FAILED)
+	{
+		proclog("ERROR:%s mmap error!\n",pathname);
+		return NULL;
+	}
+	if (p_map==(char*)-1)
+		p_map=0;
+	close(fd);
+//	proclog("mmap size:%d",msize);
+//	proclog(logfd,logbuf);
+	//syslog(LOG_INFO,"%d",statbuf.st_size);
+	return p_map;
+}
+char* init_mmap_read(char *pathname)
+{
+	int fd;
+	char *map=NULL;
+	struct stat statbuf;
+	fd=open(pathname,0);
+	if(fd<0)
+	{
+		proclog("ERROR:open %s error!",pathname);
+		return NULL;
+	}
+	if (fstat(fd, &statbuf) < 0)
+	{
+		proclog("ERROR:fstat %s error!",pathname);
+		return NULL;
+	}
+	if ((map = mmap(0, statbuf.st_size, PROT_READ, MAP_SHARED,fd, 0)) == MAP_FAILED)
+	{
+		proclog("ERROR:map %s error!",pathname);
+		return NULL;
+	}
+	if (map==(char*)-1)
+		map=0;
+	close(fd);
+	//syslog(LOG_INFO,"%d",statbuf.st_size);
+	return map;
 }
