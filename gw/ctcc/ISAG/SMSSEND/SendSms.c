@@ -224,11 +224,10 @@ static fulfil(char *p_data)
 			
 			//update result
 			char sql[256];
-			proclog("update mt set resp='%s',issent=1 where ID='%s'",
+			sprintf(sql, "update wraith_mt set resp='%s'  where ID='%s'",
 										ns2__sendSmsResponse.result,
 										receiptRequest.correlator
 										);
-				proclog(sql);
 				mysql_exec(&mysql,sql);
 			
 			

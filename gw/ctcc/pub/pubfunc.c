@@ -46,7 +46,7 @@ void proclog(const char *fmt,...)
 	int fd;
 
 	//log content
-	sprintf(buf,"[%s][md:%s][ver:%s]: %s\n",ts_nano,mdname,version,tmp);
+	sprintf(buf,"[%s][%s][%s]: %s\n",ts_nano,mdname,version,tmp);
 	//printf("%s",buf);
 
 
