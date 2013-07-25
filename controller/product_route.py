@@ -37,7 +37,7 @@ class Product_route:
         return False
     
     def __search__(self,gwid, sp_number, message):
-        print "'%s','%s'"%(sp_number, message)
+        #print "'%s','%s'"%(sp_number, message)
         for product in self.products:
             if(product['gwid'] == gwid) and (product['sp_number'] == sp_number) and (product['message'] == message):
                 return product

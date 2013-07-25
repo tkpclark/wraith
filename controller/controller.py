@@ -1,3 +1,4 @@
+import sys
 from Mydb import mysql
 import time
 import urllib
@@ -12,12 +13,23 @@ from product_route import *
 
 class MoData:
     
+    __seq_file__ = "id.seq"
     def get_deal_pos(self):
-        return 1
-    def set_deal_pos(self):
-        return True
+        f = open(self.__seq_file__)
+        id = f.read()
+        id = id.strip()
+        f.close()
+        if(id.isdigit()):
+            return id
+        else:
+            print("not digtal in %s"%(self.__seq_file__))
+            sys.exit(1)
+    def set_deal_pos(self, id):
+        f = open(self.__seq_file__,'w+')
+        f.write(id)
+        f.close()
     def read_data(self):
-        sql = "select * from wraith_mo where id > '%d' limit 1"%(self.get_deal_pos())
+        sql = "select * from wraith_mo where id > '%s' limit 1"%(self.get_deal_pos())
         data = mysql.queryAll(sql);
         return data
     
@@ -71,6 +83,8 @@ def main():
                     pass
             else:
                 logging.info('!!! %s + %s + %s not match',record['gwid'], record['sp_number'], record['message'])   
+            
+            mo_data.set_deal_pos(record['id'])
             time.sleep(10)
 if __name__ == "__main__":
     main()
