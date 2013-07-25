@@ -1,23 +1,13 @@
-import Mydb
+from Mydb import mysql
 import time
 import urllib
 import urllib2
 import logging
 from logging.handlers import RotatingFileHandler
 import json
+from product_route import *
 
 
-
-#import ExPosition
-#import LoadMoData
-#import prod_route
-
-host = '202.85.209.109'
-user = 'wraith'
-password = 'tengyewudi2012@)!@'
-logfile = '/home/app/wraith/logs/controller/controller.log'
-
-mysql = Mydb.Mydb(host, user, password)
 
 
 class MoData:
@@ -27,15 +17,9 @@ class MoData:
     def set_deal_pos(self):
         return True
     def read_data(self):
-        global mysql
         sql = "select * from wraith_mo where id > '%d' limit 1"%(self.get_deal_pos())
         data = mysql.queryAll(sql);
         return data
-
-def prod_route(cmd,spnumber,gwid):
-    url = "http://202.85.209.109/wraithapp/test.php"
-    #logging.debug('got' + cmd)
-    return url
     
 def exec_app(appurl):
     opener = urllib2.build_opener()
@@ -56,6 +40,7 @@ def exec_app(appurl):
 def init_env():
     
     #init logging
+    logfile = '/home/app/wraith/logs/controller/controller.log'
     Rthandler = RotatingFileHandler(logfile, maxBytes=10*1024*1024,backupCount=5)
     formatter = logging.Formatter('[%(asctime)s][%(levelname)s][1.00]:  %(message)s - %(filename)s:%(lineno)d')
     Rthandler.setFormatter(formatter)
@@ -63,23 +48,30 @@ def init_env():
     logger.addHandler(Rthandler)
     logger.setLevel(logging.NOTSET)
     
+    #init product_route
+    global product_route
+    product_route = Product_route()
+    product_route.load_products()
+    
 def main():
     
     init_env()
-    mysql.selectDb('wraith')
     mo_data = MoData() 
     
     while True:
         data = mo_data.read_data()
         for record in data:
             #logging.debug(json.dumps(record))
-            app_url = prod_route(record['message'], record['sp_number'], record['gwid'])
-            app_url += '?record=' + urllib.quote_plus(json.dumps(record))
-            logging.info(app_url)
-            if(exec_app(app_url) == True):
-                pass
-                
-        time.sleep(10)
+            app_url = product_route.match(record['gwid'], record['sp_number'], record['message'])
+            
+            if(app_url != False):
+                app_url += '?record=' + urllib.quote_plus(json.dumps(record))
+                logging.info(app_url)
+                if(exec_app(app_url) == True):
+                    pass
+            else:
+                logging.info('!!! %s + %s + %s not match',record['gwid'], record['sp_number'], record['message'])   
+            time.sleep(10)
 if __name__ == "__main__":
     main()
     

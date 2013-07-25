@@ -81,13 +81,14 @@ class Mydb:
 		 self.conn.close()
 
 
-'''
+
 host = '202.85.209.109'
 user = 'wraith'
 password = 'tengyewudi2012@)!@'
 
 mysql = Mydb(host, user, password)
 mysql.selectDb('wraith')
+'''
 result = mysql.queryAll("select * from wraith_mo");
 print result
 '''
