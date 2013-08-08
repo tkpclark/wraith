@@ -78,6 +78,7 @@ def main():
 
         for record in data:
             #logging.debug(json.dumps(record))
+            logging.info(record)
             product = product_route.match(record['gwid'], record['sp_number'], record['message'])
             
             if(product != False):
