@@ -56,7 +56,7 @@ void proclog(const char *fmt,...)
 	strftime(ts,30,"%Y%m%d",(const struct tm *)localtime(&tt));
 	sprintf(filename,"%s/%s.log", logpath,ts);
 
-	fd=open(filename, O_CREAT|O_WRONLY|O_APPEND,0644);
+	fd=open(filename, O_CREAT|O_RDWR|O_APPEND, S_IRWXU|S_IRWXG|S_IRWXO);
 	if(fd <0)
 	{
 		printf("open %s failed!%s\n",filename,strerror(errno));

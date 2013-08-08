@@ -10,7 +10,7 @@ int main(int argc, char **argv)
 	//header
 	char *linkid="999999999999999";
 	struct ns4__NotifySOAPHeader NotifySOAPHeader;
-	NotifySOAPHeader.linkId=linkid;s
+	NotifySOAPHeader.linkId=linkid;
 	soap.header = (struct SOAP_ENV__Header *)soap_malloc(&soap, sizeof(struct SOAP_ENV__Header));
 	soap.header->ns4__NotifySOAPHeader=&NotifySOAPHeader;
 

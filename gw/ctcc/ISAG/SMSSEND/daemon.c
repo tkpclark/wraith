@@ -302,7 +302,7 @@ static daemain(int argc,char **argv)
 		}
 		if(check_children_state())
 			create_children(argv);
-		sleep(3);//quit/fetch data/create child/
+		sleep(1);//quit/fetch data/create child/
 		//proclog("sleeping");
 	}
 }

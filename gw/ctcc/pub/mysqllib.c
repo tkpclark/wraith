@@ -21,7 +21,7 @@ void mysql_exec(MYSQL *mysql,char *buf)
 	unsigned int myerr;
 	int i;
 	i=1;
-	proclog("%s",buf);
+	//proclog("%s",buf);
 	MYRE:
 	if (mysql_query(mysql,buf))
 	{

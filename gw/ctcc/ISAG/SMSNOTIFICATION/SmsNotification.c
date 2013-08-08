@@ -8,7 +8,7 @@
 
 //char logbuf[1024];
 char mdname[]="SmsNotification";
-char logpath[] = "/home/app/logs/ctccgw";
+char logpath[] = "../logs/ctccgw/";
 char version[]="1.00";
 
 static char ip[32];
@@ -27,7 +27,7 @@ static void read_config()
 	config.comment_char = '#';
 	config.sep_char = '=';
 	config.str_char = '"';
-	ccl_parse(&config, "/home/app/wraith/src/gw/ctcc/conf/config.ccl");
+	ccl_parse(&config, "../conf/ctccgw.ccl");
 	while((iter = ccl_iterate(&config)) != 0)
 	{
 		if(!strcmp(iter->key,"ip"))
@@ -47,7 +47,19 @@ static void read_config()
 	//proclog("[%s][%s][%s][%s][%s]",ip,db,user,pass,gwid);
 }
 
+static workdir(char *path)
+{
+        char workdir[128];
+        strcpy(workdir,path);
+        char *p=NULL;
+        p=strrchr(workdir,'/');
+        *p=0;
+        //printf("workdir:%s\n", workdir);
 
+        chdir(workdir);
+
+
+}
 static void my_init()
 {
 	read_config();
@@ -163,6 +175,7 @@ int __ns1__notifySmsReception(struct soap *soap, struct ns2__notifySmsReception 
 int main(int argc, char **argv)
 { 
 	SOAP_SOCKET m, s; /* master and slave sockets */
+	workdir(argv[0]);
 	my_init();
 	struct soap soap;
 	soap_init(&soap);
