@@ -25,6 +25,7 @@ static char dbip[16];
 static char dbuser[16];
 static char dbpass[32];
 static char dbname[32];
+static char gwid[4];
 
 static MYSQL mysql;
 
@@ -149,7 +150,7 @@ static int fetch_data()
 	//	proclog(logbuf);
 	char sql[256];
 
-	sprintf(sql,"select * from wraith_mt where ID > %d limit 500",(off_t)(*(unsigned int*)p_map));
+	sprintf(sql,"select * from wraith_mt where ID > %d and gwid=%s limit 500",(off_t)(*(unsigned int*)p_map), gwid);
 	//proclog(sql);
 	mysql_query(&mysql,"set names gbk");
 	mysql_query(&mysql,sql);
@@ -230,6 +231,8 @@ static void read_config()
 			strcpy(dbpass,iter->value);
 		else if(!strcmp(iter->key,"db"))
 			strcpy(dbname,iter->value);
+		else if(!strcmp(iter->key,"gwid"))
+			strcpy(gwid,iter->value);
 	}
 	ccl_release(&config);
 }
