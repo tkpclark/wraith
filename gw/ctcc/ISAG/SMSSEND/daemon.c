@@ -164,25 +164,29 @@ static int fetch_data()
 		memset(tmp,0,rcdlen);
 
 		if(row[0]!=NULL)//seqid
-			*(int*)(tmp+252)=atol(row[0]);
+			*(int*)(tmp+350)=atol(row[0]);
 		
-		if(row[1]!=NULL)//address
-			strcpy(tmp+196,row[3]);
+		if(row[3]!=NULL)//address
+			strcpy(tmp+260,row[3]);
 		
 		if(row[2]!=NULL)//senderName
-			strcpy(tmp+26,row[2]);
+			strcpy(tmp+40,row[2]);
 		
-		if(row[3]!=NULL)//message
-			strcpy(tmp+46,row[8]);
+		if(row[9]!=NULL)//message
+			strcpy(tmp+60,row[9]);
 			
-		if(row[4]!=NULL)//productID
+		if(row[7]!=NULL)//productID
 			strcpy(tmp,row[7]);
 			
-		if(row[5]!=NULL)//linkID
-			strcpy(tmp+231,row[4]);
+		if(row[4]!=NULL)//linkID
+			strcpy(tmp+320,row[4]);
 			
 		if(row[6]!=NULL)//amount==feecode
-			strcpy(tmp+221,row[6]);
+			strcpy(tmp+280,row[6]);
+
+		if(row[8]!=NULL)//code
+					strcpy(tmp+290,row[8]);
+
 
 		memcpy(p_map+512+rcdlen*i,tmp,rcdlen);
 		++i;

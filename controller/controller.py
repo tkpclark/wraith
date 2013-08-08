@@ -38,16 +38,11 @@ def exec_app(appurl):
     try:
         file = opener.open(appurl)
         resp = file.read()
+        return True
     except:
         logging.info("failed:"+appurl)
         return False
     
-    
-    
-    if(resp == 'ok'):
-        return True
-    else:
-        return False
     
 def init_env():
     
@@ -72,20 +67,36 @@ def main():
     
     while True:
         data = mo_data.read_data()
+        #print (len(data))
+        if(len(data) == 0):
+            time.sleep(1)
+            continue
+
         for record in data:
             #logging.debug(json.dumps(record))
-            app_url = product_route.match(record['gwid'], record['sp_number'], record['message'])
+            product = product_route.match(record['gwid'], record['sp_number'], record['message'])
             
-            if(app_url != False):
-                app_url += '?record=' + urllib.quote_plus(json.dumps(record))
+            if(product != False):
+                
+                #append product info for app
+                record['product_id'] = product['product_id']
+                record['product_code'] = product['product_code']
+                record['amount'] = product['amount']
+                
+                
+                #print record;
+                
+                app_url = product['url'] + '?record=' + urllib.quote_plus(json.dumps(record))
                 logging.info(app_url)
                 if(exec_app(app_url) == True):
                     pass
+                else:
+                    logging.fatal('failed to visist [%s]', app_url)
             else:
-                logging.info('!!! %s + %s + %s not match',record['gwid'], record['sp_number'], record['message'])   
+                logging.fatal('!!! %s + %s + %s not match',record['gwid'], record['sp_number'], record['message'])   
             
             mo_data.set_deal_pos(record['id'])
-            time.sleep(10)
+           # time.sleep(10)
 if __name__ == "__main__":
     main()
     

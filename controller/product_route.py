@@ -28,11 +28,11 @@ class Product_route:
         #accurately first    
         product = self.__search__(gwid, sp_number, message)
         if(product != False):
-            return product['url']
+            return product
         #probably
         product = self.__probably_match__(gwid, sp_number, message)
         if(product != False):
-            return product['url']
+            return product
         
         return False
     

@@ -15,7 +15,7 @@
 #include "SendSmsBinding.nsmap"
 
 	
-char mdname[]="sendsms";
+char mdname[32]="sendsms";
 char logpath[256];
 char version[]="1.00";
 static int quit;
@@ -131,7 +131,7 @@ static fulfil(char *p_data)
 			char *FA="";
 			enum xsd__boolean multicastMessaging=xsd__boolean__false_;
 			char utfcontent[512];
-			char *description="kooxin";
+			char *description="wraith";
 			char *currency="19";
 			char *interfaceName="smssend";
 	
@@ -143,7 +143,7 @@ static fulfil(char *p_data)
 			struct ns4__ChargingInformation charging;
 			
 			char pn[]="tel:";
-			strcat(pn,p_data+196);
+			strcat(pn,p_data+260);
 			addresses[0]=pn;
 			ns4_RequestSOAPHeader.spId=spid;
 			getTimeStamp(timeStamp);
@@ -153,11 +153,11 @@ static fulfil(char *p_data)
 			ns4_RequestSOAPHeader.timeStamp=timeStamp;
 	
 			ns4_RequestSOAPHeader.productId=p_data;
-			ns4_RequestSOAPHeader.linkId=p_data+231;
+			ns4_RequestSOAPHeader.linkId=p_data+320;
 			ns4_RequestSOAPHeader.transactionId=transactionId;
 			
 			char SAN[32];
-			strncpy(SAN,p_data+26,8);
+			strncpy(SAN,p_data+40,8);
 			ns4_RequestSOAPHeader.SAN=SAN;
 			
 			ns4_RequestSOAPHeader.OA=addresses[0];
@@ -167,24 +167,24 @@ static fulfil(char *p_data)
 	
 			charging.description=description;
 			charging.currency=currency;
-			charging.amount=p_data+221;
-			charging.code=p_data+226;
+			charging.amount=p_data+280;
+			charging.code=p_data+290;
 			receiptRequest.endpoint=addresses[0];
 			receiptRequest.interfaceName=interfaceName;
 			char strseqid[16];
-			receiptRequest.correlator=tostr(*(int*)(p_data+252),strseqid);
-			*(unsigned int*)(p_map)=*(int*)(p_data+252);//tell daemon where the child has processed
+			receiptRequest.correlator=tostr(*(int*)(p_data+350),strseqid);
+			*(unsigned int*)(p_map)=*(int*)(p_data+350);//tell daemon where the child has processed
 			
 			memset(utfcontent,0,sizeof(utfcontent));
-			to_utf(p_data+46,utfcontent);
+			to_utf(p_data+60,utfcontent);
 			//gb2u("utf8",mySmsDS.MsgContent,strlen(mySmsDS.MsgContent),gcontent,&len);
 			//to_uc(mySmsDS.MsgContent,uc2msg);
 			ns2__sendSms.__sizeaddresses=1;
 			ns2__sendSms.addresses=addresses;
-			ns2__sendSms.senderName=p_data+26;
+			ns2__sendSms.senderName=p_data+40;
 			ns2__sendSms.charging=&charging;
 			ns2__sendSms.message=utfcontent;
-			//ns2__sendSms.message=p_data+46;
+			//ns2__sendSms.message=p_data+60;
 			//ns2__sendSms.message=message;
 			ns2__sendSms.receiptRequest=&receiptRequest;
 			
@@ -203,7 +203,7 @@ static fulfil(char *p_data)
 											ns4_RequestSOAPHeader.linkId,
 											ns2__sendSms.charging->amount,
 											charging.code,
-											p_data+46
+											p_data+60
 											);
 
 			
@@ -252,6 +252,8 @@ main()
 	char tmp[8]={0};
 	struct sigaction signew;
 	
+	sprintf(mdname, "%s-%d", mdname, getpid());
+
 	prtpid=getppid();
 	if(atexit(&procquit))
 	{
@@ -309,15 +311,16 @@ main()
 	{
 		if(quit)
 			exit(0);
-			alarm(200);
+		alarm(200);
 		myflock(lockfd,1);
 		if(!*(unsigned int*)(p_map+2*sizeof(unsigned int)))
 		{
 			myflock(lockfd,2);
 			//proclog(MESSAGE:logfd,"no data now");
 			//pause();
-			mysql_exec(&mysql,"set names gbk");
-			sleep(60*20);
+			//mysql_exec(&mysql,"set names gbk");
+			mysql_ping(&mysql);
+			sleep(60);
 			continue;
 		}
 		curnum=*(unsigned int*)(p_map+sizeof(unsigned int));

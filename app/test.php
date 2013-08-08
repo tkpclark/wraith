@@ -14,14 +14,15 @@
 	var_dump($record);
 	//$sql = "select * from wraith_mo";
 	echo $record->{'sp_number'};
-	$sql = sprintf("insert into wraith_mt(gwid,sp_number,phone_number,linkid,amount,product_id,message,in_time) 
-			values ('%s', '%s', '%s', '%s', '%s', '%s', '%s', NOW() )",
+	$sql = sprintf("insert into wraith_mt(gwid,sp_number,phone_number,linkid,amount,product_id,product_code,message,in_time) 
+			values ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s',NOW() )",
 		$record->{'gwid'},
 		$record->{'sp_number'},
 		$record->{'phone_number'},
 		$record->{'linkid'},
-		100,
-		2000000000000,
+		$record->{'amount'},
+		$record->{'product_id'},
+		$record->{'product_code'},
 		$record->{'message'}
 		);
 	echo $sql;
