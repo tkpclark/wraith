@@ -1,4 +1,5 @@
 import sys
+import os
 from Mydb import mysql
 import time
 import urllib
@@ -45,6 +46,9 @@ def exec_app(appurl):
     
     
 def init_env():
+    
+    #chdir
+    os.chdir(sys.path[0])
     
     #init logging
     logfile = '/home/app/wraith/logs/controller/controller.log'
