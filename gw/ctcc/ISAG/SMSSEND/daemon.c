@@ -148,11 +148,11 @@ static int fetch_data()
 	//	sprintf(logbuf,"fetch from %d \n",rcdlen*( (off_t)(*(unsigned int*)p_map) ) );
 	//	proclog(logbuf);
 	char sql[256];
-	strcpy(sql,"set names gbk");
-	mysql_exec(&mysql,sql);
+
 	sprintf(sql,"select * from wraith_mt where ID > %d limit 500",(off_t)(*(unsigned int*)p_map));
 	//proclog(sql);
-	mysql_exec(&mysql,sql);
+	mysql_query(&mysql,"set names gbk");
+	mysql_query(&mysql,sql);
 	result=mysql_store_result(&mysql);
 	gotnum=mysql_num_rows(result);
 //	sprintf(logbuf,"got [%d] rows",gotnum);
@@ -302,7 +302,7 @@ static daemain(int argc,char **argv)
 		}
 		if(check_children_state())
 			create_children(argv);
-		sleep(10);//quit/fetch data/create child/
+		sleep(3);//quit/fetch data/create child/
 		//proclog("sleeping");
 	}
 }
