@@ -14,6 +14,24 @@
 	var_dump($record);
 	//$sql = "select * from wraith_mo";
 	echo $record->{'sp_number'};
+	
+	
+	if(substr($record->{'message'},0,1)=='1')
+		$message = '双鹏展业欢迎您！这里是游戏玩家业务，回复5+任意内容体验指尖互动，回复a+任意内容体验双鹏咨询！';
+	if(substr($record->{'message'},0,1)=='2')
+		$message = '双鹏展业欢迎您！这里是游戏乐园业务，回复5+任意内容体验指尖互动，回复a+任意内容体验双鹏咨询！';
+	if(substr($record->{'message'},0,1)=='3')
+		$message = '双鹏展业欢迎您！这里是娱乐无限业务，回复5+任意内容体验指尖互动，回复a+任意内容体验双鹏咨询！';
+	if(substr($record->{'message'},0,1)=='4')
+		$message = '双鹏展业欢迎您！这里是游戏天地业务，回复5+任意内容体验指尖互动，回复a+任意内容体验双鹏咨询！';
+	if(substr($record->{'message'},0,1)=='5')
+		$message = '双鹏展业欢迎您！这里是指尖互动业务，回复5+任意内容体验指尖互动，回复a+任意内容体验双鹏咨询！';
+	if(strtolower(substr($record->{'message'},0,1))=='a')
+		$message = '双鹏展业欢迎您！这里是双鹏资讯业务，回复5+任意内容体验指尖互动，回复a+任意内容体验双鹏咨询！';
+	
+	
+	
+	
 	$sql = sprintf("insert into wraith_mt(gwid,sp_number,phone_number,linkid,amount,product_id,product_code,message,in_time) 
 			values ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s',NOW() )",
 		$record->{'gwid'},
@@ -23,7 +41,8 @@
 		$record->{'amount'},
 		$record->{'product_id'},
 		$record->{'product_code'},
-		$record->{'message'}
+		//$record->{'message'}
+		$message
 		);
 	echo $sql;
 	$logging->info($sql);

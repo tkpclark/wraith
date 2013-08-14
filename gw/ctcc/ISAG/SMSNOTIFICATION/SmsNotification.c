@@ -111,13 +111,17 @@ int __ns1__notifySmsReception(struct soap *soap, struct ns2__notifySmsReception 
 
 	//printf("1:%s\n",soap->header->ns4__NotifySOAPHeader->spId);
 	//printf("2:%s\n",ns2__notifySmsReception->message->message);
+
+	/*
 	char gbcontent[512];
 	memset(gbcontent,0,sizeof(gbcontent));
 	to_gb(ns2__notifySmsReception->message->message,gbcontent);
+	*/
+
 	
 	proclog("[Reception]regId[%s]message[%s]sender[%s]servnumber[%s]linkid[%s]",
 			ns2__notifySmsReception->registrationIdentifier,
-			gbcontent,
+			ns2__notifySmsReception->message->message,
 			//ns2__notifySmsReception->message->message,
 			ns2__notifySmsReception->message->senderAddress,
 			ns2__notifySmsReception->message->smsServiceActivationNumber,
@@ -134,11 +138,12 @@ int __ns1__notifySmsReception(struct soap *soap, struct ns2__notifySmsReception 
 	char sql[512];
 	sprintf(sql,"insert into wraith_mo( in_date, phone_number, message, sp_number, linkid, gwid ) values (NOW(),'%s', '%s', '%s', '%s', '%s');",
 			phone_number,
-			gbcontent,
+			ns2__notifySmsReception->message->message,
 			sp_number,
 			soap->header->ns4__NotifySOAPHeader->linkId,
 			gwid
 			);
+	mysql_exec(&mysql,"set names utf8");
 	mysql_exec(&mysql, sql);
 
 

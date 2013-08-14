@@ -152,7 +152,7 @@ static int fetch_data()
 
 	sprintf(sql,"select * from wraith_mt where ID > %d and gwid=%s limit 500",(off_t)(*(unsigned int*)p_map), gwid);
 	//proclog(sql);
-	mysql_query(&mysql,"set names gbk");
+	mysql_query(&mysql,"set names utf8");
 	mysql_query(&mysql,sql);
 	result=mysql_store_result(&mysql);
 	gotnum=mysql_num_rows(result);

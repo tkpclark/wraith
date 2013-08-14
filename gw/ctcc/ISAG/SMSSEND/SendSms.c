@@ -131,8 +131,8 @@ static fulfil(char *p_data)
 			char *FA="";
 			enum xsd__boolean multicastMessaging=xsd__boolean__false_;
 			char utfcontent[512];
-			char *description="wraith";
-			char *currency="19";
+			char *description="";
+			char *currency="";
 			char *interfaceName="smssend";
 	
 			struct soap soap;
@@ -168,22 +168,22 @@ static fulfil(char *p_data)
 			charging.description=description;
 			charging.currency=currency;
 			charging.amount=p_data+280;
-			charging.code=p_data+290;
+			charging.code="";
 			receiptRequest.endpoint=addresses[0];
 			receiptRequest.interfaceName=interfaceName;
 			char strseqid[16];
 			receiptRequest.correlator=tostr(*(int*)(p_data+350),strseqid);
 			*(unsigned int*)(p_map)=*(int*)(p_data+350);//tell daemon where the child has processed
 			
-			memset(utfcontent,0,sizeof(utfcontent));
-			to_utf(p_data+60,utfcontent);
+			//memset(utfcontent,0,sizeof(utfcontent));
+			//to_utf(p_data+60,utfcontent);
 			//gb2u("utf8",mySmsDS.MsgContent,strlen(mySmsDS.MsgContent),gcontent,&len);
 			//to_uc(mySmsDS.MsgContent,uc2msg);
 			ns2__sendSms.__sizeaddresses=1;
 			ns2__sendSms.addresses=addresses;
 			ns2__sendSms.senderName=senderName;
 			ns2__sendSms.charging=&charging;
-			ns2__sendSms.message=utfcontent;
+			ns2__sendSms.message=p_data+60;
 			//ns2__sendSms.message=p_data+60;
 			//ns2__sendSms.message=message;
 			ns2__sendSms.receiptRequest=&receiptRequest;

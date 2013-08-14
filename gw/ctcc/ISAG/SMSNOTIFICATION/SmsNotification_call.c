@@ -2,6 +2,11 @@
 #include "SmsNotificationBinding.nsmap"
 int main(int argc, char **argv)
 {
+	if(argc < 2)
+	{
+		printf("content please!\n");
+		exit(0);
+	}
 	SOAP_SOCKET m, s; /* master and slave sockets */
 	struct soap soap;
 	soap_init(&soap);
@@ -20,7 +25,7 @@ int main(int argc, char **argv)
 
 	const char *soap_endpoint="http://202.85.209.109/services/SmsNotification";
 
-	char *message="11";
+	char *message=argv[1];
 	char *senderAddress="tel:13910002000";
 	char *smsServiceActivationNumber="tel:10660766";
 
