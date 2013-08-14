@@ -76,7 +76,7 @@ int __ns1__notifySmsDeliveryReceipt(struct soap *soap, struct ns2__notifySmsDeli
 			gwid
 			);
 	*/
-	sprintf(sql,"update wraith_mt set report='%s' where id=%d",ns2__notifySmsDeliveryReceipt->deliveryStatus->deliveryStatus,ns2__notifySmsDeliveryReceipt->correlator);
+	sprintf(sql,"update wraith_mt set report='%d' where id=%s",ns2__notifySmsDeliveryReceipt->deliveryStatus->deliveryStatus,ns2__notifySmsDeliveryReceipt->correlator);
 	mysql_exec(&mysql, sql);
 	//writing heapfile
 	/*
