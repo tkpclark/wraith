@@ -69,11 +69,14 @@ int __ns1__notifySmsDeliveryReceipt(struct soap *soap, struct ns2__notifySmsDeli
 {
 	proclog("[notifySmsDeliveryReceipt]corr[%s]status[%d]",ns2__notifySmsDeliveryReceipt->correlator,ns2__notifySmsDeliveryReceipt->deliveryStatus->deliveryStatus);
 	char sql[512];
+	/*
 	sprintf(sql,"insert into wraith_mr( in_date, match_id, report, gwid ) values (NOW(),'%s', '%d', '%s');",
 			ns2__notifySmsDeliveryReceipt->correlator,
 			ns2__notifySmsDeliveryReceipt->deliveryStatus->deliveryStatus,
 			gwid
 			);
+	*/
+	sprintf(sql,"update wraith_mt set report='%s' where id=%d",ns2__notifySmsDeliveryReceipt->deliveryStatus->deliveryStatus,ns2__notifySmsDeliveryReceipt->correlator);
 	mysql_exec(&mysql, sql);
 	//writing heapfile
 	/*

@@ -158,7 +158,7 @@ static fulfil(char *p_data)
 			
 			char senderName[32];
 			sprintf(senderName,"%s",p_data+40);
-			ns4_RequestSOAPHeader.SAN=senderName;
+			ns4_RequestSOAPHeader.SAN="";
 			
 			ns4_RequestSOAPHeader.OA=addresses[0];
 			ns4_RequestSOAPHeader.FA=FA;
