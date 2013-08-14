@@ -20,9 +20,9 @@ int main(int argc, char **argv)
 
 	const char *soap_endpoint="http://202.85.209.109/services/SmsNotification";
 
-	char *message="hello,i am clark!";
-	char *senderAddress="13910002000";
-	char *smsServiceActivationNumber="10668888";
+	char *message="11";
+	char *senderAddress="tel:13910002000";
+	char *smsServiceActivationNumber="tel:10660766";
 
 	char *registrationIdentifier="registrationIdentifier";
 
@@ -38,5 +38,9 @@ int main(int argc, char **argv)
 	struct ns2__notifySmsReceptionResponse notifySmsReceptionResponse;
 
 	soap_call___ns1__notifySmsReception(&soap, soap_endpoint, NULL, &NotifySmsReception, &notifySmsReceptionResponse);
+	if (soap.error)
+	{
+		soap_print_fault(&soap, stderr);
+	}
 	return 0;
 }

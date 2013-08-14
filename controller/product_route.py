@@ -9,15 +9,23 @@ class Product_route:
         self.products = mysql.queryAll(sql);
         
     def __probably_match__(self,gwid, sp_number, message):
+            
+        ##
+        i = 0
         while True:
-            if(len(sp_number) == 9 and sp_number.find(self.__t__)>0):
+            i += 1
+            if(len(sp_number) <= 9 and sp_number.find(self.__t__)>0):
                 break
-            sp_number = self.__extend_prob__(sp_number)
+            if(i != 1):
+                sp_number = self.__extend_prob__(sp_number)
             _message = message
+            j=0
             while True:
+                j += 1
                 if(_message == self.__t__):
                     break
-                _message = self.__extend_prob__(_message)               
+                if(j != 1):
+                    _message = self.__extend_prob__(_message)               
                 product = self.__search__(gwid, sp_number, _message)
                 if(product != False):
                     return product
@@ -25,6 +33,11 @@ class Product_route:
         return False
     
     def match(self, gwid, sp_number, message):
+        
+        #there is  "tel:" before ctcc spnumber, need to remove it
+        if(sp_number[0:4] == 'tel:'):
+            sp_number = sp_number[4:]
+            
         #accurately first    
         product = self.__search__(gwid, sp_number, message)
         if(product != False):

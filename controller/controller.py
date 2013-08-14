@@ -83,6 +83,7 @@ def main():
             
             if(product != False):
                 
+                logging.info('match product:' + product['id']);
                 #append product info for app
                 record['product_id'] = product['product_id']
                 record['product_code'] = product['product_code']

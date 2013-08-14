@@ -74,7 +74,7 @@ int __ns1__notifySmsDeliveryReceipt(struct soap *soap, struct ns2__notifySmsDeli
 			ns2__notifySmsDeliveryReceipt->deliveryStatus->deliveryStatus,
 			gwid
 			);
-	mysql_get_data(&mysql, sql,data);
+	mysql_exec(&mysql, sql);
 	//writing heapfile
 	/*
 	int fd;
@@ -121,15 +121,22 @@ int __ns1__notifySmsReception(struct soap *soap, struct ns2__notifySmsReception 
 			soap->header->ns4__NotifySOAPHeader->linkId);
 
 	
+
+	char phone_number[32]={0};
+	strcpy(phone_number,ns2__notifySmsReception->message->senderAddress+4);
+	char sp_number[32]={0};
+	strcpy(sp_number,ns2__notifySmsReception->message->smsServiceActivationNumber+4);
+
+
 	char sql[512];
 	sprintf(sql,"insert into wraith_mo( in_date, phone_number, message, sp_number, linkid, gwid ) values (NOW(),'%s', '%s', '%s', '%s', '%s');",
-			ns2__notifySmsReception->message->senderAddress,
+			phone_number,
 			gbcontent,
-			ns2__notifySmsReception->message->smsServiceActivationNumber,
+			sp_number,
 			soap->header->ns4__NotifySOAPHeader->linkId,
 			gwid
 			);
-	mysql_get_data(&mysql, sql,data);
+	mysql_exec(&mysql, sql);
 
 
 

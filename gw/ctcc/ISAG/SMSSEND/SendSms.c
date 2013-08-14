@@ -142,7 +142,7 @@ static fulfil(char *p_data)
 			struct ns4__SimpleReference receiptRequest;
 			struct ns4__ChargingInformation charging;
 			
-			char pn[]="tel:";
+			char pn[32]="tel:";
 			strcat(pn,p_data+260);
 			addresses[0]=pn;
 			ns4_RequestSOAPHeader.spId=spid;
@@ -156,9 +156,9 @@ static fulfil(char *p_data)
 			ns4_RequestSOAPHeader.linkId=p_data+320;
 			ns4_RequestSOAPHeader.transactionId=transactionId;
 			
-			char SAN[32];
-			strncpy(SAN,p_data+40,8);
-			ns4_RequestSOAPHeader.SAN=SAN;
+			char senderName[32];
+			sprintf(senderName,"%s",p_data+40);
+			ns4_RequestSOAPHeader.SAN=senderName;
 			
 			ns4_RequestSOAPHeader.OA=addresses[0];
 			ns4_RequestSOAPHeader.FA=FA;
@@ -181,7 +181,7 @@ static fulfil(char *p_data)
 			//to_uc(mySmsDS.MsgContent,uc2msg);
 			ns2__sendSms.__sizeaddresses=1;
 			ns2__sendSms.addresses=addresses;
-			ns2__sendSms.senderName=p_data+40;
+			ns2__sendSms.senderName=senderName;
 			ns2__sendSms.charging=&charging;
 			ns2__sendSms.message=utfcontent;
 			//ns2__sendSms.message=p_data+60;
@@ -206,22 +206,23 @@ static fulfil(char *p_data)
 											p_data+60
 											);
 
-			
+			SOAP_SOCKET m, s; /* master and slave sockets */
 			soap_init(&soap);
 			soap.header = (struct SOAP_ENV__Header *)soap_malloc(&soap, sizeof(struct SOAP_ENV__Header));
 			soap_set_mode(&soap, SOAP_C_UTFSTRING);
 			soap.header->ns4__RequestSOAPHeader=&ns4_RequestSOAPHeader;
 
-			soap_call___ns1__sendSms(&soap, serverurl, "",&ns2__sendSms,&ns2__sendSmsResponse);
-			/*
-		  if (soap.error)
+			//proclog("server:[%s]", serverurl);
+			soap_call___ns1__sendSms(&soap, serverurl, NULL,&ns2__sendSms,&ns2__sendSmsResponse);
+
+			if (soap.error)
 			{
+				//printf("SendSms:\n");
 			   	soap_print_fault(&soap, stderr);
-			   	syslog(LOG_INFO,"soap error!\n");
+			   	proclog("soap error!");
 			}
-			*/
 			
-			
+			proclog("correlator[%s]result[%s]", receiptRequest.correlator, ns2__sendSmsResponse.result);
 			//update result
 			char sql[256];
 			sprintf(sql, "update wraith_mt set resp='%s'  where ID='%s'",
