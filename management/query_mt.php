@@ -23,7 +23,7 @@
 	//echo "pn:".$pn."<br>";
 	
 	////////
-	$sql="set names gbk";
+	$sql="set names utf8";
   exsql($sql);
 
 		$sql="select count(*) from $tbl

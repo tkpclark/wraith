@@ -63,6 +63,7 @@
 				limit $start_item,$pg_lmt ;";
 
 	 //echo $sql;
+	 exsql("set names utf8");
   $result=exsql($sql) or die (mysql_error());
   $got_num=mysqli_num_rows($result);
   ////////
