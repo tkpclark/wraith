@@ -107,14 +107,14 @@ div.dashboard {
 		width: 16px;
 	}
 	div.dashboard td.invalid {
-		color: #666;
+		color: #F4F6FD;
 	}
 	div.dashboard td.valid {
-		color: #FFF;
+		color: #000;
 		cursor: pointer;
 	}
 	div.dashboard td.active,
 	div.dashboard td.hover {
-		color: #CF0;
+		color: #FE2EF7;
 		cursor: pointer;
 	}

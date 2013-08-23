@@ -14,185 +14,93 @@
 		
 		
 		//form
-		echo "<form name=statistic action= statistic.php method=post>";
+		echo "<form name=statistic action=statistic.php method=post>";
 		
 		//table
-		echo "<table border='1' cellspacing='0' cellpadding='1' width='80%' class='tabs'>";
+		echo "<table>";
 		
 		//first line of table
-		echo "<th colspan='7'>查询条件</th>";
+		//echo "<th colspan='7'>查询条件</th>";
 		
 		//second line of table
-		echo "<tr width='30' align='left'>";
+		echo "<tr>";
+		
+		
 		$start_date = isset($_POST['d1'])?$_POST['d1']:date("Y-m-d");;
 		echo "<td>MO开始时间&nbsp;<input id='date1' name='d1' type='text' value=$start_date></td>";
-	
-	
-		/***********sp*************/
-		//$sp = (isset($_POST['sp'])&&($_POST['sp']!='%'))?$_POST['sp']:"全部";
-		if(isset($_POST['sp']) && $_POST['sp']!='%')
-		{
-					$sql = "select spname from mtrs_sp where id='".$_POST['sp']."'";
-					$result=mysql_query($sql) or die (mysql_error());
-					$row=mysql_fetch_row($result);
-					$sp=$row[0];
-					$sp_value=$_POST['sp'];
-		}
-		else
-		{
-					$sp = "全部";
-					$sp_value='%';
-		}
-		echo "<td>SP&nbsp;&nbsp;";
-		echo "<select name=sp>";
-		$sql="select id, spname from mtrs_sp where status=1";
-		echo "<option value='$sp_value'>$sp</option>";
-		echo "<option value='%'>全部</option>";
-		$result=mysql_query($sql) or die (mysql_error());
-		while($row=mysql_fetch_row($result))
-		{
-			echo "<option value=$row[0]>$row[1]</option>";
-		}
-		echo "</select>";
-		echo "</td>";
-		
-		/***********cp*************/
-		if(isset($_POST['cp']) && $_POST['cp']!='%')
-		{
-					$sql = "select cpname from mtrs_cp where id='".$_POST['cp']."'";
-					$result=mysql_query($sql) or die (mysql_error());
-					$row=mysql_fetch_row($result);
-					$cp=$row[0];
-					$cp_value=$_POST['cp'];
-		}
-		else
-		{
-					$cp = "全部";
-					$cp_value='%';
-		}
-		echo "<td>CP&nbsp;&nbsp;";
-		echo "<select name=cp>";
-		$sql="select id, cpname from mtrs_cp where status=1";
-		echo "<option value='$cp_value'>$cp</option>";
-		echo "<option value='%'>全部</option>";
-		$result=mysql_query($sql) or die (mysql_error());
-	 	while($row=mysql_fetch_row($result))
-		{
-			echo "<option value=$row[0]>$row[1]</option>";
-		}
-		echo "</select>";
-		echo "</td>";
-		
-		
-		/***********phone*************/
-		$phone=isset($_POST['phone'])?$_POST['phone']:"";
-		echo "<td>手机号<input id=phone name=phone type=text value='$phone' /></td>";
-		
-		
-		
-		echo "<td></td>";
-		echo "</tr>";
-	
-		//third line of table
-		echo "<tr width='30' align='left'>";
 		$end_date = isset($_POST['d2'])?$_POST['d2']:date("Y-m-d");;
 		echo "<td>MO结束时间&nbsp;<input id='date2' name='d2' type='text' value=$end_date></td>";
-		
-		
-		
-		/***********channel*************/
-		if(isset($_POST['channel']) && $_POST['channel']!='%')
+		echo "</tr></table>";
+	
+		echo "<table><tr><td>";
+		/*********** GWID *************/
+		$gwid=isset($_POST['gwid'])?$_POST['gwid']:"All";
+		echo "GWID&nbsp;&nbsp;";
+		echo "<select name=gwid>";
+		$sql="select id from wraith_gw where status=1";
+		echo "<option value='$gwid'>$gwid</option>";
+		echo "<option value='All'>All</option>";
+		$result=exsql($sql);
+		while($row=mysqli_fetch_row($result))
 		{
-					$sql = "select spnumber, mocmd from mtrs_channel where id='".$_POST['channel']."'";
-					$result=mysql_query($sql) or die (mysql_error());
-					$row=mysql_fetch_row($result);
-					$channel="$row[0]+$row[1]";
-					$channel_value=$_POST['channel'];
-		}
-		else
-		{
-					$channel = "全部";
-					$channel_value='%';
-		}
-		echo "<td>通道&nbsp;&nbsp;";
-		echo "<select name=channel>";
-		echo "<option value='$channel_value'>$channel</option>";
-		echo "<option value='%'>全部</option>";
-		$sql="select id, spnumber, mocmd from mtrs_channel where status=1";
-		$result=mysql_query($sql) or die (mysql_error());
-		while($row=mysql_fetch_row($result))
-		{
-			echo "<option value=$row[0]>$row[1]+$row[2]</option>";
+			echo "<option value=$row[0]>$row[0]</option>";
 		}
 		echo "</select>";
-		echo "</td>";
+		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 		
-		
-		
-	
-	
-		/***********cmd*************/
-		if(isset($_POST['cmd']) && $_POST['cmd']!='%')
+		/*********** product_id *************/
+		$product_id=isset($_POST['product_id'])?$_POST['product_id']:"All";
+		echo "计费代码&nbsp;&nbsp;";
+		echo "<select name=product_id>";
+		$sql="select distinct(product_id) from wraith_products where status=1";
+		echo "<option value='$product_id'>$product_id</option>";
+		echo "<option value='All'>All</option>";
+		$result=exsql($sql);
+		while($row=mysqli_fetch_row($result))
 		{
-					$sql = "select spnumber, mocmd from mtrs_cmd where id='".$_POST['cmd']."'";
-					$result=mysql_query($sql) or die (mysql_error());
-					$row=mysql_fetch_row($result);
-					$cmd="$row[0]+$row[1]";
-					$cmd_value=$_POST['cmd'];
-		}
-		else
-		{
-					$cmd = "全部";
-					$cmd_value='%';
-		}
-		echo "<td>指令";
-		echo "<select name=cmd>";
-		echo "<option value='$cmd_value'>$cmd</option>";
-		echo "<option value='%'>全部</option>";
-		$sql="select id, spnumber, mocmd from mtrs_cmd where status=1";
-		$result=mysql_query($sql) or die (mysql_error());
-		while($row=mysql_fetch_row($result))
-		{
-			echo "<option value=$row[0]>$row[1]+$row[2]</option>";
+		echo "<option value=$row[0]>$row[0]</option>";
 		}
 		echo "</select>";
-		echo "</td>";
+		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 		
+		/***********sp_number*************/
+		$sp_number=isset($_POST['sp_number'])?$_POST['sp_number']:"All";
+		echo "SP号码<input id=sp_number name=sp_number type=text value='$sp_number' />";
+		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 		
-		/***********zone*************/
-		if(isset($_POST['zone']) && $_POST['zone']!='%')
+
+		/***********area*************/
+		if(isset($_POST['area']) && $_POST['area']!='All')
 		{
-					$zone_value=$_POST['zone'];
-					$zone=$area_code[$zone_value];
+					$area_value=$_POST['area'];
+					$area=$area_code[$area_value];
 					
 		}
 		else
 		{
-					$zone = "全部";
-					$zone_value='%';
+					$area = "All";
+					$area_value='All';
 		}
 		
-		echo "<td>地区&nbsp;&nbsp;&nbsp;";
-		echo "<select name=zone>";
-		echo "<option value='$zone_value'>$zone</option>";
-		echo "<option value='%'>全部</option>";
+		echo "地区&nbsp;&nbsp;&nbsp;";
+		echo "<select name=area>";
+		echo "<option value='$area_value'>$area</option>";
+		echo "<option value='All'>All</option>";
 		while($key = key($area_code))
 		{
 			echo "<option value='$key'>$area_code[$key]</option>";
 			next($area_code);
 		}
 		echo "</select>";
-		echo "</td>";
+		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 		
 	
 		
-		echo "<td></td>";
-		echo "</tr>";
+		echo "</td></tr></table>";
+		/*******************group*******************************/
 		
-		
+		echo "<table><tr><td>";
 		//分组信息
-		echo "<tr>";
-		echo "<td colspan='4'>";
 		
 		//日期分组
 		$date_group=isset($_POST['date_group'])?"checked":"";
@@ -212,37 +120,34 @@
 		echo "</select>";
 		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 		
-		//sp分组
-		$sp_group=isset($_POST['sp_group'])?"checked":"";
-		echo "<input type='checkbox' name='sp_group' $sp_group>sp分组";
-		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-		
-		//通道分组
-		$channel_group=isset($_POST['channel_group'])?"checked":"";
-		echo "<input type='checkbox' name='channel_group' $channel_group>通道分组";
-		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-		
-		//cp分组
-		$cp_group=isset($_POST['cp_group'])?"checked":"";
-		echo "<input type='checkbox' name='cp_group' $cp_group>cp分组";
-		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-		
-		//指令分组
-		$cmd_group=isset($_POST['cmd_group'])?"checked":"";
-		echo "<input type='checkbox' name='cmd_group' $cmd_group>指令分组";
+		//gwid分组
+		$gwid_group=isset($_POST['gwid_group'])?"checked":"";
+		echo "<input type='checkbox' name='gwid_group' $gwid_group>网关分组";
 		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 		
 		//省份分组
-		$zone_group=isset($_POST['zone_group'])?"checked":"";
-		echo "<input type='checkbox' name='zone_group' $zone_group>省份分组";
+		$area_group=isset($_POST['area_group'])?"checked":"";
+		echo "<input type='checkbox' name='area_group' $area_group>地区分组";
 		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 		
-		echo "</td>";
+		//产品分组
+		$product_id_group=isset($_POST['product_id_group'])?"checked":"";
+		echo "<input type='checkbox' name='product_id_group' $product_id_group>产品分组";
+		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 		
-		echo "<td><input type=submit name='submit' value='提交'></td>";
-		echo "</tr>";
-		echo "</table>";
-	
+		//长号码分组
+		$sp_number_group=isset($_POST['sp_number_group'])?"checked":"";
+		echo "<input type='checkbox' name='sp_number_group' $sp_number_group>长号码分组";
+		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+		
+		
+		
+		echo "</td></tr></table>";
+		
+		
+		
+		
+		echo "<input type=submit name='submit' value='提交'></td>";
 		echo "</form>";
 		
 		
@@ -253,27 +158,23 @@
 		echo $sp."<br>";
 		echo $channel."<br>";
 		echo $phone."<br>";
-		echo $zone."<br>";
+		echo $area."<br>";
 		*/
 		
 		
 		//table
-		echo "<table border='1' cellspacing='0' cellpadding='1' width='80%' class='tabs'>";
+		echo "<table>";
 		echo "<tr>
   				<th>ID</th>
   				<th>日期</th>
-  				<th>sp</th>
-  				<th>通道道</th>
-  				<th>cp</th>
-  				<th>指令</th>
+				<th>网关</th>
+				<th>产品</th>
+  				<th>长号码</th>
   				<th>省份</th>
-  				<th>MO</th>
-  				<th>MO(成功)</th>
-  				<th>百分比</th>
-  				<th>转发MO</th>
-  				<th>转发MO(成功)</th>
-  				<th>百分比</th>			
-  				<th>金额</th>
+  				<th>总数</th>
+  				<th>成功总数</th>
+  				<th>百分比</th>		
+  				<th>总金额</th>
   				</tr>";	
   				
   	//compose sql
@@ -284,81 +185,72 @@
 		{
 			$group_flag=1;
 			if($date_type=='day')
-				$sql.="DATE_FORMAT(stat_date,'%Y-%m-%d'), ";
+				$sql.="DATE_FORMAT(stat_time,'%Y-%m-%d'), ";
 			else
-				$sql.="DATE_FORMAT(stat_date,'%Y-%m-%d %H'), ";
+				$sql.="DATE_FORMAT(stat_time,'%Y-%m-%d %H'), ";
 		}
 		else
 		{
-			$sql.="'全部', ";
+			$sql.="'All', ";
 		}
-		
-		if($sp_group=="checked")
+		/////////
+		if($gwid_group=="checked")
 		{
 			$group_flag=1;
-			$sql.="spname, ";
+			$sql.="gwid, ";
 		}
 		else
 		{
-			$sql.="'全部', ";
+			$sql.="'All', ";
 		}
-		
-		if($channel_group=="checked")
+		////////
+		if($product_id_group=="checked")
 		{
 			$group_flag=1;
-			$sql.="chn_spnumber, chn_mocmd, ";
+			$sql.="product_id, ";
 		}
 		else
 		{
-			$sql.="'全部', '', ";
+			$sql.="'All', ";
 		}
 		
-		if($cp_group=="checked")
+		
+		/////////
+		if($sp_number_group=="checked")
 		{
 			$group_flag=1;
-			$sql.="cpname, ";
+			$sql.="sp_number, ";
 		}
 		else
 		{
-			$sql.="'全部', ";
+			$sql.="'All', ";
 		}
 		
-		if($cmd_group=="checked")
+		////////	
+		if($area_group=="checked")
 		{
 			$group_flag=1;
-			$sql.="cmd_spnumber, cmd_mocmd, ";
+			$sql.="area, ";
 		}
 		else
 		{
-			$sql.="'全部', '',";
-		}
-		
-		if($zone_group=="checked")
-		{
-			$group_flag=1;
-			$sql.="zone, ";
-		}
-		else
-		{
-			$sql.="'全部', ";
+			$sql.="'All', ";
 		}
 		
 		
-		$sql.="sum(msg_total),sum(msg_success),sum(msg_forward_total), sum(msg_forward_success),sum(msg_total_fee) from mtrs_stat where 1 ";
+		$sql.="sum(num),sum(success_num),sum(all_amount) from wraith_statistic where 1 ";
 		if($start_date)
-			$sql.="and stat_date >= '$start_date 00:00:00' ";
+			$sql.="and stat_time >= DATE_FORMAT('$start_date 00:00:00','%Y-%m-%d:%H')";
 		if($end_date)
-			$sql.="and stat_date <= '$end_date 23:59:59' ";
-		if($sp_value!='%')
-			$sql.="and spID = $sp_value ";
-		if($channel_value!='%')
-			$sql.="and channelID = $channel_value ";
-		if($cp_value!='%')
-			$sql.="and cpID = $cp_value ";
-		if($cmd_value!='%')
-			$sql.="and cmdID = $cmd_value ";
-		if($zone_value!='%')
-			$sql.="and zone = '$zone_value' ";
+			$sql.="and stat_time <= DATE_FORMAT('$end_date 23:59:59','%Y-%m-%d:%H')";
+		if($sp_number!='All')
+			$sql.="and sp_number = '$sp_number' ";
+		if($gwid!='All')
+			$sql.="and gwid = '$gwid' ";
+		if($product_id!='All')
+			$sql.="and product_id = '$product_id' ";
+		if($area_value!='All')
+			$sql.="and area = '$area_value' ";
 			
 		//group by
 		if($group_flag==1)
@@ -366,22 +258,19 @@
 				$sql.="group by ";
 			
 				if($date_group=="checked")
-					$sql.="stat_date,";
+					$sql.="stat_time,";
 					
-				if($sp_group=="checked")
-					$sql.="spID,";
+				if($product_id_group=="checked")
+					$sql.="product_id,";
 					
-				if($channel_group=="checked")
-					$sql.="channelID,";
+				if($sp_number_group=="checked")
+					$sql.="sp_number,";
 				
-				if($cp_group=="checked")
-					$sql.="cpID,";
-					
-				if($cmd_group=="checked")
-					$sql.="cmdID,";
-					
-				if($zone_group=="checked")
-					$sql.="zone,";
+				if($gwid_group=="checked")
+					$sql.="gwid,";
+									
+				if($area_group=="checked")
+					$sql.="area,";
 					
 				//drop the last comma
 				
@@ -393,82 +282,64 @@
 		
 		
 		
-		$result=mysql_query($sql) or die (mysql_error());	
+		$result=exsql($sql);	
 			
-		//echo $sql."&nbsp;";
-		//echo "result:".mysql_num_rows($result)."<br>";
+		echo $sql."&nbsp;";
+		echo "result:".mysqli_num_rows($result)."<br>";
 		$i=0;
 		
-		$sum_mo=0;
-		$sum_mo_suc=0;
-		$sum_msg_forward=0;
-		$sum_msg_forward_suc=0;
-		$sum_msg_total_fee=0;
-		
-		while($row=mysql_fetch_row($result))
+		$sum=0;//总条数
+		$sum_success=0;//总成功条数
+		$sum_all_amount=0;//总金额
+		while($row=mysqli_fetch_row($result))
 		{
 				$i++;
 				echo "<tr align='center'>";
 				echo "<td>$i</td>";
 				echo "<td>$row[0]</td>";
 				echo "<td>$row[1]</td>";
-				echo "<td>$row[2]&nbsp;$row[3]</td>";
-				echo "<td>$row[4]</td>";
-				echo "<td>$row[5]&nbsp;$row[6]</td>";
-				if($row[7]=='全部')
+				echo "<td>$row[2]</td>";
+				echo "<td>$row[3]</td>";
+				if($row[4]=='All')
 				{
-						echo "<td>$row[7]</td>";
+						echo "<td>$row[4]</td>";
 				}
 				else
 				{
-						$area_key=$row[7];
+						$area_key=$row[4];
 						echo "<td>$area_code[$area_key]</td>";
-						//echo "<td>$row[7]</td>";
+						//echo "<td>$row[4]</td>";
 				}
 					
-				echo "<td>$row[8]</td>";
-				echo "<td>$row[9]</td>";
+				echo "<td>$row[5]</td>";
+				echo "<td>$row[6]</td>";
 				
 				//percentage
-				$percent=$row[8]>0?number_format(100*$row[9]/$row[8],2)."%":"";
+				$percent=$row[5]>0?number_format(100*$row[6]/$row[5],2)."%":"";
 				echo "<td>".$percent."</td>";
+				echo "<td>$row[7]</td>";
 				
-				echo "<td>$row[10]</td>";
-				echo "<td>$row[11]</td>";
-				
-				//percentage
-				$percent=$row[10]>0?number_format(100*$row[11]/$row[10],2)."%":"";
-				echo "<td>".$percent."</td>";
-				
-				//msg_total_fee
-				echo "<td>".$row[12]."</td>";
 				
 				echo "</tr>";
 				
 				
-				$sum_mo+=$row[8];
-				$sum_mo_suc+=$row[9];
-				$sum_msg_forward+=$row[10];
-				$sum_msg_forward_suc+=$row[11];
-				$sum_msg_total_fee+=$row[12];
+				$sum+=$row[5];
+				$sum_success+=$row[6];
+				$sum_all_amount+=$row[7];
 				
 				
 		}
-		mysql_free_result($result);
+		mysqli_free_result($result);
    
    
 	   //合计
 	   echo "<tr align='center'>";
-	   echo "<td>合计</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td>";
-	   echo "<td>$sum_mo</td>";
-	   echo "<td>$sum_mo_suc</td>";
-	   $percent=$sum_mo>0?number_format(100*$sum_mo_suc/$sum_mo,2)."%":"0.00%";
-			echo "<td>".$percent."</td>";
-	   echo "<td>$sum_msg_forward</td>";
-	   echo "<td>$sum_msg_forward_suc</td>";
-	   $percent=$sum_msg_forward>0?number_format(100*$sum_msg_forward_suc/$sum_msg_forward,2)."%":"0.00%";
-			echo "<td>".$percent."</td>";
-			echo "<td>".$sum_msg_total_fee."</td>";
+	   echo "<td>合计</td><td>--</td><td>--</td><td>--</td><td>--</td><td>--</td>";
+	   echo "<td>$sum</td>";
+	   echo "<td>$sum_success</td>";
+	   $percent=$sum>0?number_format(100*$sum_success/$sum,2)."%":"0.00%";
+		echo "<td>".$percent."</td>";
+		echo "<td>".$sum_all_amount."</td>";
 	   echo "</tr>";
 		
 		echo "";

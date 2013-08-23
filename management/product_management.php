@@ -8,7 +8,8 @@
 		$product_id=$_POST['product_id'];
 		$product_code=$_POST['product_code'];
 		$app=$_POST['app'];
-		$mo=strtoupper($_POST['mo']);
+		$sp_number=$_POST['sp_number'];
+		$mo=$_POST['mo'];
 		$mt=$_POST['mt'];
 		$fee=$_POST['fee'];
 		$gwid=$_POST['gwid'];
@@ -18,9 +19,9 @@
 			$sql="set names utf8";
 			exsql($sql);
 			
-		
+			exsql("set names utf8");
 			$sql="insert into wraith_products(product_id,product_code,url,sp_number,message,amount,gwid,default_msg)
-						values('$product_id','$product_code','$app','$mo','$fee','$fee','$gwid','$mt')";
+						values('$product_id','$product_code','$app','$sp_number','$mo','$fee','$gwid','$mt')";
 			//echo $sql;
 			exsql($sql);
 		}
@@ -30,9 +31,9 @@
 			mysqli_query($mysqli,$sql) or die (mysqli_error());
 			
 			$id=$_GET['id'];
-			$sql="update wraith_products set cmdID='$cmdID',productID='$productID',mo='$mo',mt='$mt',fee='$fee' where id=$id";
+			$sql="update wraith_products set product_id='$product_id',product_code='$product_code',sp_number='$sp_number',url='$app',message='$mo',default_msg='$mt',amount='$fee',gwid='$gwid' where id=$id";
 			//echo $sql;
-			mysqli_query($mysqli,$sql) or die (mysqli_error());
+			exsql($sql);
 		}
 	}
 	
@@ -51,6 +52,7 @@
 			if($_GET['cmd']==2)
 			{
 				$id=$_GET['id'];
+				exsql("set names utf8");
 				$sql="select * from wraith_products where ID=$id";
 				//echo $sql;
 				$result=mysqli_query($mysqli,$sql) or die (mysqli_error());
@@ -79,7 +81,7 @@
 				echo "<td><input type=text name=app value=".(isset($row[3])&&$row[3]?$row[3]:'""')." size=120></td>";
 				echo "<tr>";
 				echo "<td>SP号码&nbsp;</td>";
-				echo "<td><input type=text name=sp_number value=".(isset($row[4])&&$row[2]?$row[4]:'""')."  size=120></td>";
+				echo "<td><input type=text name=sp_number value=".(isset($row[4])&&$row[4]?$row[4]:'""')."  size=120></td>";
 				echo "<tr>";
 				echo "<td>上行指令&nbsp;</td>";
 				echo "<td><input type=text name=mo value=".(isset($row[5])&&$row[5]?$row[5]:'""')."  size=120></td>";
@@ -131,6 +133,7 @@
   				<th>SP号码</th>
   				<th>指令</th>
   				<th>资费</th>
+  				<th>默认回复</th>
   				<th>网关代码</th>
   				<th>删除</th>
   				<th>修改</th>
@@ -146,6 +149,7 @@
   					<td>$row[4]</td>
   					<td>$row[5]</td>
   					<td>$row[6]</td>
+  					<td>$row[8]</td>
   					<td>$row[7]</td>
   					<td><a href='product_management.php?cmd=1&id=$row[0]'>删除</a></td>
   					<td><a href='product_management.php?cmd=2&id=$row[0]'>修改</a></td>

@@ -20,25 +20,26 @@ def stat():
     mysql.query(sql)
     
     ##group
-    sql = "select gwid,sp_number,product_id,product_code,amount,count(*) as num from `wraith_mt` where %s='%s' group by gwid,sp_number,product_id,product_code" % (db_stat_hour,stat_hour)
+    sql = "select gwid,sp_number,product_id,product_code,amount,area,count(*) as num from `wraith_mt` where %s='%s' group by gwid,sp_number,product_id,product_code,area" % (db_stat_hour,stat_hour)
     print sql
     result = mysql.queryAll(sql)
     if(len(result)):
         for row in result:
-            where_clause = " %s='%s' and gwid='%s' and sp_number='%s' and product_id='%s' and product_code='%s' and amount='%s'"%(db_stat_hour,stat_hour,row['gwid'],row['sp_number'],row['product_id'],row['product_code'],row['amount'])
+            where_clause = " %s='%s' and gwid='%s' and sp_number='%s' and product_id='%s' and product_code='%s' and amount='%s' and area='%s' "%(db_stat_hour,stat_hour,row['gwid'],row['sp_number'],row['product_id'],row['product_code'],row['amount'],row['area'])
             print "num: " + row['num']
             #count sucessful record number:
-            csql = "select count(*) as r from wraith_mt where %s and (report = 4 or report  ='DELIVRD') " % (where_clause)
+            csql = "select count(*) as success_num, sum(amount) as success_amount from wraith_mt where %s and (report = 4 or report  ='DELIVRD') " % (where_clause)
             print csql
             cresult = mysql.queryAll(csql)
-            success_num = cresult[0]['r']
+            success_num = cresult[0]['success_num']
+            success_amount = cresult[0]['success_amount']
         
             
             #count other
             
             
             #insert
-            csql = "insert into wraith_statistic(gwid,sp_number,product_id,product_code,amount,stat_time,num,success_num)values('%s','%s','%s','%s','%s','%s','%s','%s')" % (row['gwid'],row['sp_number'],row['product_id'],row['product_code'],row['amount'],stat_hour,row['num'],success_num)
+            csql = "insert into wraith_statistic(gwid,sp_number,product_id,product_code,amount,stat_time,area,num,success_num,all_amount)values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (row['gwid'],row['sp_number'],row['product_id'],row['product_code'],row['amount'],stat_hour,row['area'],row['num'],success_num,cresult[0]['success_amount'])
             print csql
             mysql.query(csql)
 def init_env():

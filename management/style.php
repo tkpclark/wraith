@@ -16,7 +16,6 @@
 		.h {background-color: #9999cc; font-weight: bold; color: #000000;}
 		.v {background-color: #cccccc; color: #000000;}
 		i {color: #666666; background-color: #cccccc;}
-		img {float: right; border: 0px;}
 		hr {width: 600px; background-color: #cccccc; border: 0px; height: 1px; color: #000000;}
 		table {  
             border: 1px solid #B1CDE3;  
@@ -29,7 +28,7 @@
           
         td,th {  
             border: 1px solid #B1CDE3;  
-            background: #fff;  
+            background: #F4F6FD;  
             font-size:12px;  
             padding: 3px 3px 3px 8px;  
             color: #4f6b72;  
