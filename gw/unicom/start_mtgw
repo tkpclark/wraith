@@ -1,5 +1,0 @@
-while true
-do
-	./unimt
-	sleep 2
-done
