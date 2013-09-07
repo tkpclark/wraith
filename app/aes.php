@@ -24,11 +24,12 @@ function fnDecrypt($Value, $SecretKey, $iv){
 	$str = strippadding(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $SecretKey, base64_decode($Value), MCRYPT_MODE_CBC, $iv));
 	return $str;
 }
-
-//自定您的KEY , IV
 /*
+//自定您的KEY , IV
+
 $KEY = 't5d0c#OAn%MAhLWD';
 $IV =  'L+\~f4,Ir)b$=pkf';
+
 $Value = '1234';
 //壓碼使用範例:
 $en = fnEncrypt($Value,$KEY,$IV);
@@ -38,4 +39,6 @@ $en = fnEncrypt($Value,$KEY,$IV);
 $de = fnDecrypt($en,$KEY,$IV);
 //echo $de;
 */
+
+
 ?>
