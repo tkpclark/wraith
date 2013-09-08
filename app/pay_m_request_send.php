@@ -36,11 +36,12 @@ $Prim = urldecode($p1);
 $url = 'http://202.85.209.109/pay_m_7453';
 $post_data = "Prim=".$Prim."&PayChannelCode=SJDXSPDX";
 $ch = curl_init () ;
-curl_setopt ( $ch , CURLOPT_POST , 1 ) ;
-curl_setopt ( $ch , CURLOPT_HEADER , 0 ) ;
-curl_setopt ( $ch , CURLOPT_URL , $url ) ;
-curl_setopt ( $ch , CURLOPT_POSTFIELDS , $post_data ) ;
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_URL, $url);
+curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
 $result = curl_exec ( $ch ) ;
+curl_close($ch);
 echo $result;
 
 

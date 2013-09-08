@@ -7,9 +7,11 @@ Logger::configure('log4php_config.xml');
 $logging = Logger::getLogger('pay_m_record');
 
 
+
+$record = json_decode($_GET['record']);
 //====================
 $sql = sprintf("insert into wraith_pay_m_record(in_time,Phone,fee,linkid,message,sp_number)
-			 values(NOW(),'%s','%s','%s','%s')",
+			 values(NOW(),'%s','%s','%s','%s','%s')",
 		$record->{'phone_number'},
 		$record->{'amount'},
 		$record->{'linkid'},
