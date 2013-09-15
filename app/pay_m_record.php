@@ -35,7 +35,7 @@ $sql = sprintf("insert into wraith_mt(gwid,sp_number,phone_number,linkid,amount,
 		$record->{'product_id'},
 		$record->{'product_code'},
 		//$record->{'message'}
-$message
+		$message
 );
 $logging->info($sql);
 mysqli_query($mysqli, "set names utf8");

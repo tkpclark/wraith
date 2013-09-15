@@ -8,8 +8,9 @@
 	Logger::configure('log4php_config.xml');
 	$logging = Logger::getLogger('pay_m_request');
 	
-	$pieces = explode("_",$_SERVER['REQUEST_URI']);
-	$coop_id = $pieces[2];
+	$p1 = explode("_",$_SERVER['REQUEST_URI']);
+	$p2 = explode("?",$p1[2]);
+	$coop_id = $p2[0];
 	//echo $coop_id;
 	
 	/*
@@ -27,24 +28,36 @@
 
 	$PayChannelCode = $_REQUEST['PayChannelCode'];
 	
+	
+	
 	$myAES =  new AES();
-	$prim = $myAES->decrypt(urldecode($_REQUEST['Prim']));
-	//$prim_test = "kpPovuQMHkeQlf7u2AkAfbQW1YbpOWA6YMuOulGjVVgGAGOPsGz6B94HKhWD0ajFQdBhweb11ySGqzBceRtaoA%3d%3d";
-	//$prim = $myAES->decrypt(urldecode($prim_test));
+	$prim = $myAES->decrypt($_REQUEST['Prim']);
+
 	$logging->info("prim:".$prim);
-	
-	
-	
 	$arguments = explode("~",$prim);
 	
-	$sql = sprintf("insert into wraith_pay_m_request(in_time,OrderNo,Phone,fee,CKTime,PayChannelCode,coop_id)
-			 values(NOW(),'%s','%s','%s','%s','%s','%s')",
+	if(is_phone_legal($arguments[1])==0)
+	{
+		$response = "606~不接受订单~";
+	}
+	else
+	{
+		$response = "000~成功~";
+	}
+	echo $response;
+	
+	
+	
+	//to db
+	$sql = sprintf("insert into wraith_pay_m_request(in_time,OrderNo,Phone,fee,CKTime,PayChannelCode,coop_id,response)
+			 values(NOW(),'%s','%s','%s','%s','%s','%s','%s')",
 			 $arguments[0],
 			 $arguments[1],
 			 $arguments[2],
 			 $arguments[3],
 			 $PayChannelCode,
-			 $coop_id
+			 $coop_id,
+			 $response
 			 );
 	$logging->info($sql);
 	$res = mysqli_query($mysqli, $sql);
@@ -52,7 +65,7 @@
 		$logging->info("Failed to run query: (" . $mysqli->errno . ") " . $mysqli->error);
 	}
 	
-	echo "000~成功~";
+	
 
 	
 	
