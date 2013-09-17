@@ -1,3 +1,4 @@
+#encoding:utf-8
 import sys
 import os
 from Mydb import mysql
@@ -8,8 +9,8 @@ import logging
 from logging.handlers import RotatingFileHandler
 import json
 from product_route import *
-
-
+from m_dict import *
+import datetime
 
 
 class MoData:
@@ -43,7 +44,26 @@ def exec_app(appurl):
     except:
         logging.info("failed:"+appurl)
         return False
+   
+''' 
+def check_phone_visit_count(phone_number):
+    now = datetime.datetime.now()
+    day = now.strftime('%Y-%m-%d')
+    month = now.strftime('%Y-%m')
     
+    ##look whether reach day_max
+    sql = "select visit_count from wraith_visit_count where phone_number='%s' and visit_date='%s'"%(phone_number,day)
+    logging.info(sql);
+    data = mysql.queryAll(sql);
+    if(mysql.rowcount()==0):
+       sql = "insert into wraith_visit_count (phone_number, visit_date, visit_count) values('%s','%s','1')"%(phone_number, day)
+       mysql.queryAll(sql)
+    else:
+        if(print data[0]['visit_count']>
+    ##look whether reach month max
+''' 
+
+
     
 def init_env():
     
@@ -64,6 +84,10 @@ def init_env():
     product_route = Product_route()
     product_route.load_products()
     
+    global mobile_dict
+    mobile_dict = Mobile_dict()
+    mobile_dict.load_mobile_dict()
+    
 def main():
     
     init_env()
@@ -83,12 +107,14 @@ def main():
             
             if(product != False):
                 
-                logging.info('match product:' + product['id']);
+                logging.info('match product:' + product['id'])
                 #append product info for app
                 record['product_id'] = product['product_id']
                 record['product_code'] = product['product_code']
                 record['amount'] = product['amount']
-                
+                record['area'] = mobile_dict.get_mobile_area(record['phone_number'][:7])
+                record['default_msg']=product['default_msg']
+                #check_phone_visit_count(record['phone_number'])
                 
                 #print record;
                 
@@ -97,7 +123,7 @@ def main():
                 if(exec_app(app_url) == True):
                     pass
                 else:
-                    logging.fatal('failed to visist [%s]', app_url)
+                    logging.fatal('failed to visit [%s]', app_url)
             else:
                 logging.fatal('!!! %s + %s + %s not match',record['gwid'], record['sp_number'], record['message'])   
             
