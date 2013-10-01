@@ -112,8 +112,9 @@ def main():
                 record['product_id'] = product['product_id']
                 record['product_code'] = product['product_code']
                 record['amount'] = product['amount']
-                record['area'] = mobile_dict.get_mobile_area(record['phone_number'][:7])
+                record['province'],record['area'] = mobile_dict.get_mobile_area(record['phone_number'][:7])
                 record['default_msg']=product['default_msg']
+                record['allow_province']=product['allow_province']
                 #check_phone_visit_count(record['phone_number'])
                 
                 #print record;

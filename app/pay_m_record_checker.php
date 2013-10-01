@@ -88,7 +88,7 @@ function deal_record($record)
 {
 	//echo $row['Phone'];
 	global $logging;
-	if(is_phone_legal($record['Phone'])==0)
+	if(is_phone_legal($record)==0)
 	{
 		//$logging->info($record['Phone']." is out of provinces!");
 		return 2;
@@ -131,12 +131,15 @@ function scan_record()
 	
 	while($record = $res->fetch_array(MYSQLI_ASSOC))
 	{
-		$logging->info("dealing record id:".$record['id']);
+		//$logging->info("dealing record id:".$record['id']);
 		$deal_flag = deal_record($record);
-		$logging->info("deal result: ".$deal_flag);
+		
 		//update db
 		if($deal_flag)
+		{
 			update_record($record['id'],$deal_flag);
+			$logging->info("deal result: ".$deal_flag);
+		}
 		 
 	}
 }

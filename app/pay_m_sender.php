@@ -20,7 +20,7 @@ function send_to_coop_do($request)
 	$myAES =  new AES();
 	$url='http://eft.5151pay.com/GetInfo.aspx';
 	$post_data = "Prim=".$myAES->encrypt($Prim)."&PayChannelCode=".$request['PayChannelCode'];
-	$logging->info("url:".$url." post:". $post_data);
+	//$logging->info("url:".$url." post:". $post_data);
 	//begin to send
 	$ch = curl_init () ;
 	curl_setopt($ch, CURLOPT_POST, true);
@@ -36,7 +36,7 @@ function send_to_coop_do($request)
 		$logging->info("not get resp , send later!");
 		return;
 	}
-	$logging->info("resp:".$resp);
+	//$logging->info("resp:".$resp);
 	
 	
 	////update db
@@ -67,7 +67,7 @@ function scan_request()
 
 	while($request = $res->fetch_array(MYSQLI_ASSOC))
 	{
-		$logging->info("dealing request id:".$request['id']);
+		//$logging->info("dealing request id:".$request['id']);
 		send_to_coop_do($request);		
 	}
 }

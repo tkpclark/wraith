@@ -13,7 +13,7 @@ function check_record($request)
 	global $mysqli;
 	
 	
-	$sql = sprintf("update `wraith_pay_m_record` set OrderNo='%s' where OrderNo is NULL and deal_flag= 1 and in_time > NOW()-interval 1 day",$request['OrderNo']);
+	$sql = sprintf("update `wraith_pay_m_record` set OrderNo='%s' where OrderNo is NULL and deal_flag= 1 and Phone='%s' and in_time > NOW()-interval 1 day",$request['OrderNo'],$request['Phone']);
 	//$logging->info($sql);
 	$res = mysqli_query($mysqli, $sql);
 	if (!$res) {
