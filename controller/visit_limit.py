@@ -75,9 +75,9 @@ class Visit_limit:
         visit_count_monthly=self.set_user_visit_count_monthly(phone_number, product_id, province)
         
         
-        if((int)(visit_count_dayily) >= (int)(visit_limit_daily)):
+        if((int)(visit_count_dayily) > (int)(visit_limit_daily)):
             return True
-        if((int)(visit_count_monthly) >= (int)(visit_limit_monthly)):
+        if((int)(visit_count_monthly) > (int)(visit_limit_monthly)):
             return True
         
         return False

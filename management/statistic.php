@@ -2,7 +2,6 @@
 		include("check.php"); 
 		include("style.php");
 		include("calendar/cld.php");
-		include("area_code.php");
 		
 	
 		
@@ -70,10 +69,15 @@
 		
 
 		/***********area*************/
+		$area=isset($_POST['area'])?$_POST['area']:"All";
+		echo "地区&nbsp;&nbsp;&nbsp;<input id=area name=area type=text value='$area' />";
+		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+		
+		/*
 		if(isset($_POST['area']) && $_POST['area']!='All')
 		{
 					$area_value=$_POST['area'];
-					$area=$area_code[$area_value];
+					$area=$area_value;
 					
 		}
 		else
@@ -83,6 +87,8 @@
 		}
 		
 		echo "地区&nbsp;&nbsp;&nbsp;";
+		
+		
 		echo "<select name=area>";
 		echo "<option value='$area_value'>$area</option>";
 		echo "<option value='All'>All</option>";
@@ -92,6 +98,9 @@
 			next($area_code);
 		}
 		echo "</select>";
+		*/
+		
+		
 		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 		
 	
@@ -185,9 +194,9 @@
 		{
 			$group_flag=1;
 			if($date_type=='day')
-				$sql.="DATE_FORMAT(stat_time,'%Y-%m-%d'), ";
+				$sql.="DATE_FORMAT(stat_time,'%Y-%m-%d') as ddd, ";
 			else
-				$sql.="DATE_FORMAT(stat_time,'%Y-%m-%d %H'), ";
+				$sql.="DATE_FORMAT(stat_time,'%Y-%m-%d %H') as ddd, ";
 		}
 		else
 		{
@@ -230,7 +239,7 @@
 		if($area_group=="checked")
 		{
 			$group_flag=1;
-			$sql.="area, ";
+			$sql.="province, ";
 		}
 		else
 		{
@@ -249,8 +258,8 @@
 			$sql.="and gwid = '$gwid' ";
 		if($product_id!='All')
 			$sql.="and product_id = '$product_id' ";
-		if($area_value!='All')
-			$sql.="and area = '$area_value' ";
+		if($area!='All')
+			$sql.="and province = '$area' ";
 			
 		//group by
 		if($group_flag==1)
@@ -258,7 +267,7 @@
 				$sql.="group by ";
 			
 				if($date_group=="checked")
-					$sql.="stat_time,";
+					$sql.="ddd,";
 					
 				if($product_id_group=="checked")
 					$sql.="product_id,";
@@ -270,7 +279,7 @@
 					$sql.="gwid,";
 									
 				if($area_group=="checked")
-					$sql.="area,";
+					$sql.="province,";
 					
 				//drop the last comma
 				
@@ -281,7 +290,7 @@
 		
 		
 		
-		
+		exsql("set names utf8");
 		$result=exsql($sql);	
 			
 		echo $sql."&nbsp;";
@@ -300,6 +309,7 @@
 				echo "<td>$row[1]</td>";
 				echo "<td>$row[2]</td>";
 				echo "<td>$row[3]</td>";
+				/*
 				if($row[4]=='All')
 				{
 						echo "<td>$row[4]</td>";
@@ -310,14 +320,15 @@
 						echo "<td>$area_code[$area_key]</td>";
 						//echo "<td>$row[4]</td>";
 				}
-					
+				*/
+				echo "<td>$row[4]</td>";
 				echo "<td>$row[5]</td>";
 				echo "<td>$row[6]</td>";
 				
 				//percentage
 				$percent=$row[5]>0?number_format(100*$row[6]/$row[5],2)."%":"";
 				echo "<td>".$percent."</td>";
-				echo "<td>$row[7]</td>";
+				echo "<td>".($row[7]/100)."</td>";
 				
 				
 				echo "</tr>";
@@ -339,7 +350,7 @@
 	   echo "<td>$sum_success</td>";
 	   $percent=$sum>0?number_format(100*$sum_success/$sum,2)."%":"0.00%";
 		echo "<td>".$percent."</td>";
-		echo "<td>".$sum_all_amount."</td>";
+		echo "<td>".($sum_all_amount/100)."</td>";
 	   echo "</tr>";
 		
 		echo "";

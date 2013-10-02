@@ -5,14 +5,11 @@ from Mydb import mysql
 import logging
 import datetime
 from logging.handlers import RotatingFileHandler
-def stat():
-    d = datetime.datetime.now()
-    onehour = datetime.timedelta(hours=1)
-    d -= onehour
-    stat_hour = d.strftime("%Y-%m-%d:%H")
-    print "stat hour: " + stat_hour
-    db_stat_hour = "DATE_FORMAT(in_time,'%Y-%m-%d:%H')"
+def stat(stat_hour):
     
+    print "***stat hour: " + stat_hour
+    db_stat_hour = "DATE_FORMAT(in_time,'%Y-%m-%d:%H')"
+    #db_stat_hour = sys.argv[1]
     
     #delete old days if
     sql = "delete from wraith_statistic where stat_time = '%s'" % (stat_hour)
@@ -20,12 +17,12 @@ def stat():
     mysql.query(sql)
     
     ##group
-    sql = "select gwid,sp_number,product_id,product_code,amount,area,count(*) as num from `wraith_mt` where %s='%s' group by gwid,sp_number,product_id,product_code,area" % (db_stat_hour,stat_hour)
+    sql = "select gwid,sp_number,product_id,product_code,amount,province,count(*) as num from `wraith_mt` where %s='%s' group by gwid,sp_number,product_id,product_code,province" % (db_stat_hour,stat_hour)
     print sql
     result = mysql.queryAll(sql)
     if(mysql.rowcount()>0):
         for row in result:
-            where_clause = " %s='%s' and gwid='%s' and sp_number='%s' and product_id='%s' and product_code='%s' and amount='%s' and area='%s' "%(db_stat_hour,stat_hour,row['gwid'],row['sp_number'],row['product_id'],row['product_code'],row['amount'],row['area'])
+            where_clause = " %s='%s' and gwid='%s' and sp_number='%s' and product_id='%s' and product_code='%s' and amount='%s' and province='%s' "%(db_stat_hour,stat_hour,row['gwid'],row['sp_number'],row['product_id'],row['product_code'],row['amount'],row['province'])
             print "num: " + row['num']
             #count sucessful record number:
             csql = "select count(*) as success_num, sum(amount) as success_amount from wraith_mt where %s and (report = '4' or report  ='DELIVRD' or report = '0') " % (where_clause)
@@ -37,7 +34,7 @@ def stat():
             
             
             #insert
-            csql = "insert into wraith_statistic(gwid,sp_number,product_id,product_code,amount,stat_time,area,num,success_num,all_amount)values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (row['gwid'],row['sp_number'],row['product_id'],row['product_code'],row['amount'],stat_hour,row['area'],row['num'],success_num,success_amount)
+            csql = "insert into wraith_statistic(gwid,sp_number,product_id,product_code,amount,stat_time,province,num,success_num,all_amount)values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (row['gwid'],row['sp_number'],row['product_id'],row['product_code'],row['amount'],stat_hour,row['province'],row['num'],success_num,success_amount)
             print csql
             mysql.query(csql)
 def init_env():
@@ -58,7 +55,13 @@ def init_env():
 
 def main():
     init_env()
-    stat()
+    
+    d = datetime.datetime.now()
+    onehour = datetime.timedelta(hours=1)
+    for i in range(1):
+        d -= onehour
+        stat_hour = d.strftime("%Y-%m-%d:%H")
+        stat(stat_hour)
     
 if __name__ == "__main__":
     main()
