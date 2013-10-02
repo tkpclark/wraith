@@ -61,7 +61,7 @@ class Visit_limit:
         for record in self.__v_dict__:
             #print record['product_id'],record['province']
             #print product_id,province
-            if( (record['product_id'] == product_id) and (record['province'] == 'def')):
+            if( (record['product_id'] == product_id) and (record['province'] == '默认')):
                 return (record['daily_count'],record['monthly_count'])
         
         #eventually default
@@ -72,11 +72,11 @@ class Visit_limit:
         
         #daily_limit check
         visit_count_dayily=self.set_user_visit_count_daily(phone_number, product_id, province)
+        visit_count_monthly=self.set_user_visit_count_monthly(phone_number, product_id, province)
+        
+        
         if((int)(visit_count_dayily) >= (int)(visit_limit_daily)):
             return True
-        #print visit_count_dayily, visit_limit_daily
-        #monthly_limit check
-        visit_count_monthly=self.set_user_visit_count_monthly(phone_number, product_id, province)
         if((int)(visit_count_monthly) >= (int)(visit_limit_monthly)):
             return True
         

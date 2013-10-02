@@ -10,6 +10,7 @@ from logging.handlers import RotatingFileHandler
 import json
 from product_route import *
 from m_dict import *
+from visit_limit import *
 import datetime
 
 
@@ -88,6 +89,10 @@ def init_env():
     mobile_dict = Mobile_dict()
     mobile_dict.load_mobile_dict()
     
+    global visit_limit
+    visit_limit = Visit_limit()
+    visit_limit.load_dict()
+    
 def main():
     
     init_env()
@@ -115,16 +120,15 @@ def main():
                 record['province'],record['area'] = mobile_dict.get_mobile_area(record['phone_number'][:7])
                 record['default_msg']=product['default_msg']
                 record['allow_province']=product['allow_province']
-                #check_phone_visit_count(record['phone_number'])
                 
-                #print record;
-                
-                app_url = product['url'] + '?record=' + urllib.quote_plus(json.dumps(record))
-                logging.info(app_url)
-                if(exec_app(app_url) == True):
-                    pass
+                #check_phone_visit_count
+                if(visit_limit.is_arrive_limit(record['phone_number'],product['id'],record['province'])==False):
+                    app_url = product['url'] + '?record=' + urllib.quote_plus(json.dumps(record))
+                    logging.info(app_url)
+                    if(exec_app(app_url) == False):
+                        logging.fatal('failed to visit [%s]', app_url)
                 else:
-                    logging.fatal('failed to visit [%s]', app_url)
+                    logging.info('%s arrives limit of product %s',record['phone_number'],record['product_id'])
             else:
                 logging.fatal('!!! %s + %s + %s not match',record['gwid'], record['sp_number'], record['message'])   
             
