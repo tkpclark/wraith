@@ -12,9 +12,9 @@
 #include <ccl/ccl.h>
 #include <mysql.h>
 #include "soapH.h"
-#include "SendSmsBinding.nsmap"
+#include "SendSmsServiceSoapBinding.nsmap"
 
-	
+
 char mdname[32]="sendsms";
 char logpath[256];
 char version[]="1.00";
@@ -25,7 +25,7 @@ static char mmapfile[128];
 static char logfile[128];
 static MYSQL mysql;
 static char serverurl[256];
-static char spid[32];
+static char cpID[32];
 static char key[32];
 
 static char dbip[16];
@@ -58,7 +58,7 @@ static void read_config()
 	config.comment_char = '#';
 	config.sep_char = '=';
 	config.str_char = '"';
-	ccl_parse(&config, "../conf/ctccgw.ccl");
+	ccl_parse(&config, "../conf/hmgw.ccl");
 	while((iter = ccl_iterate(&config)) != 0)
 	{
 		if(!strcmp(iter->key,"mmapfile"))
@@ -71,11 +71,11 @@ static void read_config()
 			rcdlen=atoi(iter->value);
 		else if(!strcmp(iter->key,"serverurl"))
 			strcpy(serverurl,iter->value);
-		else if(!strcmp(iter->key,"spid"))
-			strcpy(spid,iter->value);
+		else if(!strcmp(iter->key,"cpID"))
+			strcpy(cpID,iter->value);
 		else if(!strcmp(iter->key,"key"))
 			strcpy(key,iter->value);
-			
+
 		else if(!strcmp(iter->key,"ip"))
 			strcpy(dbip,iter->value);
 		else if(!strcmp(iter->key,"user"))
@@ -103,10 +103,10 @@ char* getspPwd(char* pwd,char* ts)
 	//char *key="351001355";
 	char buf[64]={0};
 	char tmp[64]={0};
-	strcpy(buf,spid);
-	strcpy(buf+strlen(spid),key);
-	strcpy(buf+strlen(spid)+strlen(key),ts);
-	MD5(buf,strlen(spid)+strlen(key)+strlen(ts),tmp);
+	strcpy(buf,cpID);
+	strcpy(buf+strlen(cpID),key);
+	strcpy(buf+strlen(cpID)+strlen(key),ts);
+	MD5(buf,strlen(cpID)+strlen(key)+strlen(ts),tmp);
 	for(i=0;i<16;i++)
 		sprintf(pwd+2*i,"%02X",*((unsigned char*)(tmp+i)));
 	//printf("%s\n",pwd);
@@ -122,89 +122,35 @@ char *tostr(int seqid,char *strseqid)
 
 static fulfil(char *p_data)
 {
-			char *addresses[1];
-			char spPassword[128];
-			char timeStamp[16];
-			//char *SAN="10661333";
-			char *transactionId="";
-			enum ns4__EndReason transEnd=ns4__EndReason__0;
-			char *FA="";
-			enum xsd__boolean multicastMessaging=xsd__boolean__false_;
-			char utfcontent[512];
-			char *description="";
-			char *currency="";
-			char *interfaceName="smssend";
-	
+	 //==========
+
 			struct soap soap;
-			struct ns2__sendSms ns2__sendSms;
-			struct ns2__sendSmsResponse ns2__sendSmsResponse;
+			enum xsd__boolean multicastMessaging=xsd__boolean__false_;
+			struct ns1__SendSmsRequest ns1__SendSmsRequest;
+			struct ns1__SendSmsResponse ns1__SendSmsResponse;
 			struct ns4__RequestSOAPHeader ns4_RequestSOAPHeader;
-			struct ns4__SimpleReference receiptRequest;
-			struct ns4__ChargingInformation charging;
-			
-			char pn[32]="tel:";
-			strcat(pn,p_data+260);
-			addresses[0]=pn;
-			ns4_RequestSOAPHeader.spId=spid;
+			struct ns1__ArrayOf_USCORExsd_USCOREstring x;
+			x.__sizeitem=1;
+			char *addresses[1];
+			addresses[0]=p_data+40;
+			x.item=addresses;
+			ns1__SendSmsRequest.message=p_data+60;
+			ns1__SendSmsRequest.receiverAddress=&x;
+			ns1__SendSmsRequest.senderAddress=p_data+260;
+
+			char cpPassword[128];
+			char timeStamp[16];
+			ns4_RequestSOAPHeader.cpID=cpID;
 			getTimeStamp(timeStamp);
-			memset(spPassword,0,sizeof(spPassword));
-			getspPwd(spPassword,timeStamp);
-			ns4_RequestSOAPHeader.spPassword=spPassword;
+			memset(cpPassword,0,sizeof(cpPassword));
+			getspPwd(cpPassword,timeStamp);
+			ns4_RequestSOAPHeader.cpPassword=cpPassword;
 			ns4_RequestSOAPHeader.timeStamp=timeStamp;
-	
-			ns4_RequestSOAPHeader.productId=p_data;
-			ns4_RequestSOAPHeader.linkId=p_data+320;
-			ns4_RequestSOAPHeader.transactionId=transactionId;
-			
-			char senderName[32];
-			sprintf(senderName,"%s",p_data+40);
-			ns4_RequestSOAPHeader.SAN="";
-			
-			ns4_RequestSOAPHeader.OA=addresses[0];
-			ns4_RequestSOAPHeader.FA=FA;
-			ns4_RequestSOAPHeader.transEnd=&transEnd;
-			ns4_RequestSOAPHeader.multicastMessaging=&multicastMessaging;
-	
-			charging.description=description;
-			charging.currency=currency;
-			charging.amount=p_data+280;
-			charging.code="";
-			receiptRequest.endpoint=addresses[0];
-			receiptRequest.interfaceName=interfaceName;
-			char strseqid[16];
-			receiptRequest.correlator=tostr(*(int*)(p_data+350),strseqid);
-			*(unsigned int*)(p_map)=*(int*)(p_data+350);//tell daemon where the child has processed
-			
-			//memset(utfcontent,0,sizeof(utfcontent));
-			//to_utf(p_data+60,utfcontent);
-			//gb2u("utf8",mySmsDS.MsgContent,strlen(mySmsDS.MsgContent),gcontent,&len);
-			//to_uc(mySmsDS.MsgContent,uc2msg);
-			ns2__sendSms.__sizeaddresses=1;
-			ns2__sendSms.addresses=addresses;
-			ns2__sendSms.senderName=senderName;
-			ns2__sendSms.charging=&charging;
-			ns2__sendSms.message=p_data+60;
-			//ns2__sendSms.message=p_data+60;
-			//ns2__sendSms.message=message;
-			ns2__sendSms.receiptRequest=&receiptRequest;
-			
-			
-			proclog("cor[%s]spid[%s]pwd[%s]ts[%s]tran[%s]san[%s]fa[%s]src[%s]dest[%s]pid[%s]linkid[%s]amount[%s]code[%s]msg[%s]",
-											receiptRequest.correlator,
-											ns4_RequestSOAPHeader.spId,
-											ns4_RequestSOAPHeader.spPassword,
-											ns4_RequestSOAPHeader.timeStamp,
-											ns4_RequestSOAPHeader.transactionId,
-											ns4_RequestSOAPHeader.SAN,
-											ns4_RequestSOAPHeader.FA,
-											ns2__sendSms.senderName,
-											receiptRequest.endpoint,
-											ns4_RequestSOAPHeader.productId,
-											ns4_RequestSOAPHeader.linkId,
-											ns2__sendSms.charging->amount,
-											charging.code,
-											p_data+60
-											);
+
+			ns4_RequestSOAPHeader.productID=p_data;
+			ns4_RequestSOAPHeader.linkID=p_data+320;
+
+
 
 			SOAP_SOCKET m, s; /* master and slave sockets */
 			soap_init(&soap);
@@ -213,35 +159,40 @@ static fulfil(char *p_data)
 			soap.header->ns4__RequestSOAPHeader=&ns4_RequestSOAPHeader;
 
 			//proclog("server:[%s]", serverurl);
-			soap_call___ns1__sendSms(&soap, serverurl, NULL,&ns2__sendSms,&ns2__sendSmsResponse);
-
+			soap_call___ns1__sendSms(&soap, serverurl, NULL,&ns1__SendSmsRequest,&ns1__SendSmsResponse);
 			if (soap.error)
 			{
 				//printf("SendSms:\n");
 			   	soap_print_fault(&soap, stderr);
 			   	proclog("soap error!");
 			}
-			
-			proclog("correlator[%s]result[%s]", receiptRequest.correlator, ns2__sendSmsResponse.result);
+
+			proclog("correlator[%s]", ns1__SendSmsResponse.requestIdentifier);
 			//update result
 			char sql[256];
-			sprintf(sql, "update wraith_mt set resp='%s'  where ID='%s'",
-										ns2__sendSmsResponse.result,
-										receiptRequest.correlator
+			sprintf(sql, "update wraith_mt set msgid='%s'  where ID='%d'",
+					ns1__SendSmsResponse.requestIdentifier,
+										*(unsigned int*)(p_data+350)
 										);
-				mysql_exec(&mysql,sql);
-			
-			
-				soap_destroy(&soap);
-				soap_end(&soap);
-				soap_done(&soap);
+			proclog("%s",sql);
+
+			mysql_exec(&mysql,sql);
 
 
-			
-			
-			
+			soap_destroy(&soap);
+			soap_end(&soap);
+			soap_done(&soap);
+
+
+			*(unsigned int*)(p_map)=*(unsigned int*)(p_data+350);
+
+
 
 			///
+
+
+
+
 }
 main()
 {
@@ -252,7 +203,7 @@ main()
 	void *p_chd;
 	char tmp[8]={0};
 	struct sigaction signew;
-	
+
 	sprintf(mdname, "%s-%d", mdname, getpid());
 
 	prtpid=getppid();
@@ -262,45 +213,48 @@ main()
 	  kill(prtpid,SIGINT);
 		pause();
 	}
+
+
 	read_config();
+	proclog("starting....");
 	//sprintf(tmp,"|%d",getpid());
 	//strcat(mdname,tmp);
 
 
-	lockfd=open("tkp.lck",O_CREAT|O_WRONLY|O_TRUNC,S_IRWXU);
+	lockfd=open("hm.lck",O_CREAT|O_WRONLY|O_TRUNC,S_IRWXU);
 	if(lockfd==-1)
 	{
 		printf("open lock file error!\n");
 		kill(prtpid,SIGINT);
 		pause();
 	}
-	
+
 	signew.sa_handler=SIG_IGN;
 	sigaction(SIGPIPE,&signew,0);
-	
+
 	signew.sa_handler=acquit;
 	sigemptyset(&signew.sa_mask);
 	signew.sa_flags=0;
   	sigaction(SIGINT,&signew,0);
-	
+
 	signew.sa_handler=acquit;
 	sigemptyset(&signew.sa_mask);
 	signew.sa_flags=0;
 	sigaction(SIGTERM,&signew,0);
-	
+
 	signew.sa_handler=gofulfil;
 	sigemptyset(&signew.sa_mask);
 	signew.sa_flags=0;
 	sigaction(SIGUSR1,&signew,0);
-	
+
 	mysql_init(&mysql);
 	   if(!mysql_real_connect(&mysql,dbip,dbuser,dbpass,dbname,0,NULL,0))
 	   {
 		sql_err_log(&mysql);
 		exit(0);
 	   }
-	
-	
+
+
 	p_map=init_mmap(mmapfile,mmapsize);
 	if(!p_map)
 	{
@@ -328,10 +282,10 @@ main()
 		leftnum=*(unsigned int*)(p_map+2*sizeof(unsigned int));
 		memcpy(p_chd,p_map+512+curnum*rcdlen,rcdlen);
 
-		*(unsigned int*)(p_map)+=1;
+		//*(unsigned int*)(p_map)=atoi(p_chd+350);
 		(*(unsigned int*)(p_map+sizeof(unsigned int)))+=1;
 		(*(unsigned int*)(p_map+2*sizeof(unsigned int)))-=1;
-	
+
 		myflock(lockfd,2);
 		if(leftnum==1)
 		{

@@ -37,7 +37,7 @@ static char *p_map;
 
 static int *ppid;
 
-static const char *pidfile="pgid.pid";
+static const char *pidfile="pgid_hm.pid";
 
 char *init_mmap(char *pathname,unsigned int msize);
 
@@ -150,8 +150,8 @@ static int fetch_data()
 	//	proclog(logbuf);
 	char sql[256];
 
-	sprintf(sql,"select * from wraith_pay_n_mo where ID > %d imit 500",(off_t)(*(unsigned int*)p_map));
-	//proclog(sql);
+	sprintf(sql,"select * from wraith_mt where ID > %d and gwid=%s limit 500",(off_t)(*(unsigned int*)p_map), gwid);
+	proclog(sql);
 	mysql_query(&mysql,"set names utf8");
 	mysql_query(&mysql,sql);
 	result=mysql_store_result(&mysql);
@@ -201,7 +201,7 @@ static void read_config()
 	config.comment_char = '#';
 	config.sep_char = '=';
 	config.str_char = '"';
-	ccl_parse(&config, "../conf/ctccgw.ccl");
+	ccl_parse(&config, "../conf/hmgw.ccl");
 	while((iter = ccl_iterate(&config)) != 0)
 	{
 
