@@ -122,13 +122,15 @@ def main():
                 record['allow_province']=product['allow_province']
                 
                 #check_phone_visit_count
-                if(visit_limit.is_arrive_limit(record['phone_number'],product['id'],record['province'])==False):
+                limit_flag = visit_limit.is_arrive_limit(record['phone_number'],product['id'],record['province'],record['gwid'])
+                if(limit_flag == 0):
                     app_url = product['url'] + '?record=' + urllib.quote_plus(json.dumps(record))
                     logging.info(app_url)
                     if(exec_app(app_url) == False):
                         logging.fatal('failed to visit [%s]', app_url)
                 else:
-                    logging.info('%s arrives limit of product %s',record['phone_number'],record['product_id'])
+                    logging.info('%s arrives limit of product %s, limit flag:%d',record['phone_number'],record['product_id'],limit_flag)
+                    
             else:
                 logging.fatal('!!! %s + %s + %s not match',record['gwid'], record['sp_number'], record['message'])   
             
