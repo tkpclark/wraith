@@ -124,7 +124,7 @@ def main():
                 #check_phone_visit_count
                 limit_flag = visit_limit.is_arrive_limit(record['phone_number'],product['id'],record['province'],record['gwid'])
                 if(limit_flag == 0):
-                    app_url = product['url'] + '?record=' + urllib.quote_plus(json.dumps(record))
+                    app_url = product['url'] + 'record=' + urllib.quote_plus(json.dumps(record))
                     logging.info(app_url)
                     if(exec_app(app_url) == False):
                         logging.fatal('failed to visit [%s]', app_url)

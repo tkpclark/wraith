@@ -5,25 +5,47 @@ require_once('mysql.php');
 
 Logger::configure('log4php_config.xml');
 $logging = Logger::getLogger('rent_record');
+/******recv $_GET arguments:*********
+*
+* send_mode
+* == 1 : send mo.mr seprately
+* == 2 : send mo & mr one time for all
+*
+*
+* mt_mode
+* == 1 : wraith send mt
+* == 2 : send mo to partner and they supply mt message
+*
+*/
 
-
+if(!isset($_REQUEST['record']) ||!isset($_REQUEST['trs_id']) || !isset($_REQUEST['mt_mode']) || !isset($_REQUEST['send_mode']))
+{
+	echo "arguments error!";
+	exit;
+}
 
 $record = json_decode($_REQUEST['record']);
+$trs_id = $_REQUEST['trs_id'];
+$send_mode = $_REQUEST['send_mode'];
+$mt_mode = $_REQUEST['mt_mode'];
 //$logging->info($record);
 //====================
 
-$status=strpos($record->{'allow_province'},$record->{'province'})===false?2:0;
 
-$sql = sprintf("insert into wraith_rent_record(in_time,Phone,fee,linkid,message,sp_number,province,area,deal_flag)
-			 values(NOW(),'%s','%s','%s','%s','%s','%s','%s','%s')",
+
+
+//$status=strpos($record->{'allow_province'},$record->{'province'})===false?2:0;
+$status=0;
+$sql = sprintf("insert into wraith_rent_record(in_date,phone_number,linkid,message,sp_number,province,area,deal_flag,trs_id,mt_mode) values(NOW(),'%s','%s','%s','%s','%s','%s','%s','%s','%s')",
 		$record->{'phone_number'},
-		$record->{'amount'},
 		$record->{'linkid'},
 		$record->{'message'},
 		$record->{'sp_number'},
 		$record->{'province'},
 		$record->{'area'},
-		$status
+		$status,
+		$trs_id,
+		$mt_mode
 	);
 $logging->info($sql);
 mysqli_query($mysqli, "set names utf8");
@@ -34,7 +56,7 @@ if (!$res) {
 
 //====================
 
-if($status==0)//给用户回信息（如果不在规定省份内，则不下发）
+if($mt_mode==1 && $status==0)//给用户回信息（如果不在规定省份内，则不下发）
 {
 	$sql = sprintf("insert into wraith_mt(gwid,sp_number,phone_number,linkid,amount,product_id,product_code,message,in_time,province,area)
 				values ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s',NOW() ,'%s','%s')",
