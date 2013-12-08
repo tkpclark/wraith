@@ -10,6 +10,7 @@ from logging.handlers import RotatingFileHandler
 import json
 from product_route import *
 from m_dict import *
+from blklist import *
 from visit_limit import *
 import datetime
 
@@ -85,6 +86,10 @@ def init_env():
     product_route = Product_route()
     product_route.load_products()
     
+    global blklist
+    blklist = Blklist()
+    blklist.load_blklist()
+    
     global mobile_dict
     mobile_dict = Mobile_dict()
     mobile_dict.load_mobile_dict()
@@ -108,8 +113,20 @@ def main():
         for record in data:
             #logging.debug(json.dumps(record))
             logging.info(record)
-            product = product_route.match(record['gwid'], record['sp_number'], record['message'])
+            mo_data.set_deal_pos(record['id'])
             
+            
+            ###blk list check
+            #logging.info("matching..."+record['phone_number'])
+            if(blklist.match(record['phone_number'])):
+                logging.info('!!!blklist:' + record['phone_number'])
+                continue
+            
+            
+            
+            
+            ##match a product            
+            product = product_route.match(record['gwid'], record['sp_number'], record['message'])
             if(product != False):
                 
                 logging.info('match product:' + product['id'])
@@ -134,7 +151,7 @@ def main():
             else:
                 logging.fatal('!!! %s + %s + %s not match',record['gwid'], record['sp_number'], record['message'])   
             
-            mo_data.set_deal_pos(record['id'])
+            
            # time.sleep(10)
 if __name__ == "__main__":
     main()
