@@ -7,10 +7,6 @@ Logger::configure('log4php_config.xml');
 $logging = Logger::getLogger('rent_record');
 /******recv $_GET arguments:*********
 *
-* send_mode
-* == 1 : send mo.mr seprately
-* == 2 : send mo & mr one time for all
-*
 *
 * mt_mode
 * == 1 : wraith send mt
@@ -18,7 +14,7 @@ $logging = Logger::getLogger('rent_record');
 *
 */
 
-if(!isset($_REQUEST['record']) ||!isset($_REQUEST['trs_id']) || !isset($_REQUEST['mt_mode']) || !isset($_REQUEST['send_mode']))
+if(!isset($_REQUEST['record']) ||!isset($_REQUEST['trs_id']) || !isset($_REQUEST['mt_mode']))
 {
 	echo "arguments error!";
 	exit;
@@ -26,7 +22,6 @@ if(!isset($_REQUEST['record']) ||!isset($_REQUEST['trs_id']) || !isset($_REQUEST
 
 $record = json_decode($_REQUEST['record']);
 $trs_id = $_REQUEST['trs_id'];
-$send_mode = $_REQUEST['send_mode'];
 $mt_mode = $_REQUEST['mt_mode'];
 //$logging->info($record);
 //====================
@@ -36,7 +31,7 @@ $mt_mode = $_REQUEST['mt_mode'];
 
 //$status=strpos($record->{'allow_province'},$record->{'province'})===false?2:0;
 $status=0;
-$sql = sprintf("insert into wraith_rent_record(in_date,phone_number,linkid,message,sp_number,province,area,deal_flag,trs_id,mt_mode) values(NOW(),'%s','%s','%s','%s','%s','%s','%s','%s','%s')",
+$sql = sprintf("insert into wraith_rent_record(in_date,phone_number,linkid,message,sp_number,province,area,deal_flag,trs_id,mt_mode,gwid,amount,product_id,product_code) values(NOW(),'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')",
 		$record->{'phone_number'},
 		$record->{'linkid'},
 		$record->{'message'},
@@ -45,7 +40,12 @@ $sql = sprintf("insert into wraith_rent_record(in_date,phone_number,linkid,messa
 		$record->{'area'},
 		$status,
 		$trs_id,
-		$mt_mode
+		$mt_mode,
+		$record->{'gwid'},
+		$record->{'amount'},
+		$record->{'product_id'},
+		$record->{'product_code'}
+		
 	);
 $logging->info($sql);
 mysqli_query($mysqli, "set names utf8");

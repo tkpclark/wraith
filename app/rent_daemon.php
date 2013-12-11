@@ -16,7 +16,7 @@ function update_deal_flag($request,$deal_flag)
 	////update db
 	mysqli_query($mysqli, "set names utf8");
 	$sql = sprintf("update wraith_rent_record set deal_flag=%d,send_time=NOW() where id = '%s'",$deal_flag, $request['id']);
-	$logging->info($sql);
+	//$logging->info($sql);
 	$res = mysqli_query($mysqli, $sql);
 	if (!$res) {
 		$logging->info("Failed to run query: (" . $mysqli->errno . ") " . $mysqli->error);
@@ -50,11 +50,11 @@ function check_report($linkid)
 	if(mysqli_num_rows($res))
 	{
 		$request = $res->fetch_array(MYSQLI_ASSOC);
-		//$logging->info("report:".$request['report']);
+		$logging->info("report:".$request['report']);
 		if($request['report']=='4' or $request['report']=='DELIVRD')
-			$report='DELIVRD';
+			$report='OK';
 		else
-			$report='FAILED';
+			$report='FAIL';
 		update_one_report($linkid,$report);
 		
 	}
@@ -64,7 +64,7 @@ function update_report()
 {
 	global $logging;
 	global $mysqli;
-	$sql = sprintf("select * from `wraith_rent_record` where length(report) < 2 and in_date > NOW()-interval 1 day");
+	$sql = sprintf("select * from `wraith_rent_record` where report is NULL and in_date > NOW()-interval 1 day");
 	//$logging->info($sql);
 	$res = mysqli_query($mysqli, $sql);
 	if (!$res) {
@@ -84,7 +84,7 @@ function send_record()
 	global $logging;
 	global $mysqli;
 	$sql = sprintf("select * from `wraith_rent_record` where deal_flag <> 2  and in_date > NOW()-interval 1 day");
-	$logging->info($sql);
+	//$logging->info($sql);
 	$res = mysqli_query($mysqli, $sql);
 	if (!$res) {
 		$logging->info("Failed to run query: (" . $mysqli->errno . ") " . $mysqli->error);

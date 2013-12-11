@@ -146,7 +146,7 @@ def main():
                     if(exec_app(app_url) == False):
                         logging.fatal('failed to visit [%s]', app_url)
                 else:
-                    logging.info('visit limit! phone_number:%s, product_id:%s, gwid:%s, limit flag:%d',record['phone_number'],record['product_id'],record['gwid'],limit_flag)
+                    logging.info('visit limit! phone_number:%s, pid:%s, product_id:%s, gwid:%s, limit flag:%d',record['phone_number'],record['id'],record['product_id'],record['gwid'],limit_flag)
                     
             else:
                 logging.fatal('!!! %s + %s + %s not match',record['gwid'], record['sp_number'], record['message'])   

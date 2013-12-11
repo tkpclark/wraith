@@ -82,7 +82,7 @@ class Visit_limit:
         
         #limit of the first 9 bits of the phone_number
         group_visit_count_dayily=self.set_user_visit_count_daily(phone_number[0:-2], product_id, province,gwid)
-        if((int)(group_visit_count_dayily)) > 20:
+        if((int)(group_visit_count_dayily)) > 80:
             return 3
         
         
