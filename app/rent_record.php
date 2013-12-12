@@ -56,7 +56,7 @@ if (!$res) {
 
 //====================
 
-if($mt_mode==1 && $status==0)//给用户回信息（如果不在规定省份内，则不下发）
+if($mt_mode==1)//给用户回信息（如果不在规定省份内，则不下发）
 {
 	$sql = sprintf("insert into wraith_mt(gwid,sp_number,phone_number,linkid,amount,product_id,product_code,message,in_time,province,area)
 				values ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s',NOW() ,'%s','%s')",

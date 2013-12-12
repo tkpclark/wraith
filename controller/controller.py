@@ -111,48 +111,62 @@ def main():
             continue
 
         for record in data:
-            #logging.debug(json.dumps(record))
+            ########logging.debug(json.dumps(record))
             logging.info(record)
             mo_data.set_deal_pos(record['id'])
             
             
-            ###blk list check
+            ##########blk list check
             #logging.info("matching..."+record['phone_number'])
             if(blklist.match(record['phone_number'])):
                 logging.info('!!!blklist:' + record['phone_number'])
                 continue
             
             
-            
-            
-            ##match a product            
+         
+            #######match a product            
             product = product_route.match(record['gwid'], record['sp_number'], record['message'])
-            if(product != False):
-                
-                logging.info('match product:' + product['id'])
-                #append product info for app
-                record['product_id'] = product['product_id']
-                record['product_code'] = product['product_code']
-                record['amount'] = product['amount']
-                record['province'],record['area'] = mobile_dict.get_mobile_area(record['phone_number'][:7])
-                record['default_msg']=product['default_msg']
-                record['allow_province']=product['allow_province']
-                
-                #check_phone_visit_count
-                limit_flag = visit_limit.is_arrive_limit(record['phone_number'],product['id'],record['province'],record['gwid'])
-                if(limit_flag == 0):
-                    app_url = product['url'] + 'record=' + urllib.quote_plus(json.dumps(record))
-                    logging.info(app_url)
-                    if(exec_app(app_url) == False):
-                        logging.fatal('failed to visit [%s]', app_url)
-                else:
-                    logging.info('visit limit! phone_number:%s, pid:%s, product_id:%s, gwid:%s, limit flag:%d',record['phone_number'],record['id'],record['product_id'],record['gwid'],limit_flag)
-                    
-            else:
+            if(product == False):
                 logging.fatal('!!! %s + %s + %s not match',record['gwid'], record['sp_number'], record['message'])   
+                continue
+            logging.info('match product:' + product['id'])
+            
+           
+            
+            ########append product info for app
+            record['product_id'] = product['product_id']
+            record['product_code'] = product['product_code']
+            record['amount'] = product['amount']
+            record['province'],record['area'] = mobile_dict.get_mobile_area(record['phone_number'][:7])
+            record['default_msg']=product['default_msg']
+            record['allow_province']=product['allow_province']
             
             
-           # time.sleep(10)
+            
+            ########check visit count 
+            limit_flag = visit_limit.is_arrive_limit(record['phone_number'],product['id'],record['province'],record['gwid'])
+            if(limit_flag > 0):
+                logging.info('visit limit! phone_number:%s, pid:%s, product_id:%s, gwid:%s, limit flag:%d',record['phone_number'],record['id'],record['product_id'],record['gwid'],limit_flag)
+                continue
+            
+            
+            
+            ########check allow province  
+            if record['province'] not in record['allow_province']:
+                logging.info('phone is not in allow provinces! province:%s',record['province'])
+                continue
+            
+            
+            ########all check is ok,do it!
+            app_url = product['url'] + 'record=' + urllib.quote_plus(json.dumps(record))
+            logging.info(app_url)
+            if(exec_app(app_url) == False):
+                logging.fatal('failed to visit [%s]', app_url)
+                    
+                
+            
+            
+            #time.sleep(10)
 if __name__ == "__main__":
     main()
     
