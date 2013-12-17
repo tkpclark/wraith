@@ -116,6 +116,12 @@ def main():
             mo_data.set_deal_pos(record['id'])
             
             
+            ########linkisok?
+            if(len(record['linkid']) < 2):
+                logging.info('!!!linkid abnormal:' + record['linkid'])
+                continue
+            
+            
             ##########blk list check
             #logging.info("matching..."+record['phone_number'])
             if(blklist.match(record['phone_number'])):
@@ -129,6 +135,10 @@ def main():
             if(product == False):
                 logging.fatal('!!! %s + %s + %s not match',record['gwid'], record['sp_number'], record['message'])   
                 continue
+            
+            
+            
+            
             logging.info('match product:' + product['id'])
             
            
@@ -157,6 +167,9 @@ def main():
                 continue
             
             
+           
+            ########
+            ########
             ########all check is ok,do it!
             app_url = product['url'] + 'record=' + urllib.quote_plus(json.dumps(record))
             logging.info(app_url)
