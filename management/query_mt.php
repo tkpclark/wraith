@@ -8,7 +8,7 @@
  	
  	$page_title="下行查询";
 	$page_name="query_mt.php";
-	$pg_lmt=1000;
+	$pg_lmt=20;
 	$tbl="wraith_mt";
 	$start_item=($pg_num-1)*$pg_lmt;
 	
@@ -91,6 +91,10 @@
       			</tr>";
       while($row=mysqli_fetch_row($result))
       {
+      		if($row[12]=='4')
+      			$report="成功";
+      		else
+      			$report="失败";
       		echo"<tr>
       					<td>$row[0]</td>
       					<td>$row[3]</td>
@@ -103,7 +107,7 @@
       					<td>$row[1]</td>
       					<td>$row[10]</td>
       					<td>$row[11]</td>
-      					<td>$row[12]</td>
+      					<td>$report</td>
       				</tr>";
       }
        mysqli_free_result($result);

@@ -8,7 +8,7 @@
  	
  	$page_title="上行查询";
 	$page_name="query_mo.php";
-	$pg_lmt=1000;
+	$pg_lmt=20;
 	$tbl="wraith_mo";
 	$start_item=($pg_num-1)*$pg_lmt;
 	
