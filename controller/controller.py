@@ -117,7 +117,7 @@ def main():
             
             
             ########linkisok?
-            if(len(record['linkid']) < 2):
+            if(record['linkid'].isdigit() == False):
                 logging.info('!!!linkid abnormal:' + record['linkid'])
                 continue
             
