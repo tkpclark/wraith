@@ -30,7 +30,7 @@ $mt_mode = $_REQUEST['mt_mode'];
 
 
 //$status=strpos($record->{'allow_province'},$record->{'province'})===false?2:0;
-$status=0;
+$status=0;//it's useless
 $sql = sprintf("insert into wraith_rent_record(in_date,phone_number,linkid,message,sp_number,province,area,deal_flag,trs_id,mt_mode,gwid,amount,product_id,product_code) values(NOW(),'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')",
 		$record->{'phone_number'},
 		$record->{'linkid'},
@@ -56,10 +56,9 @@ if (!$res) {
 
 //====================
 
-if($mt_mode==1)//给用户回信息（如果不在规定省份内，则不下发）
+if($mt_mode==1)//给用户回信息
 {
-	$sql = sprintf("insert into wraith_mt(gwid,sp_number,phone_number,linkid,amount,product_id,product_code,message,in_time,province,area)
-				values ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s',NOW() ,'%s','%s')",
+	$sql = sprintf("insert into wraith_mt(gwid,sp_number,phone_number,linkid,amount,product_id,product_code,message,in_time,province,area) values ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s',NOW() ,'%s','%s')",
 			$record->{'gwid'},
 			$record->{'sp_number'},
 			$record->{'phone_number'},

@@ -4,6 +4,7 @@ require_once('des.php');
 
 function send_to_destination_1501($request)
 {
+	//齐顺
 	//mo 加密前参数依次为 手机号#指令#长号码#linkid
 	//mr 加密前参数依次为 手机号#指令#长号码#linkid#状态报告
 	

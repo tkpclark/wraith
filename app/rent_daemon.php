@@ -5,6 +5,7 @@ require_once('mysql.php');
 require_once('AES_official.php');
 require_once('pay_m_lib.php');
 require_once('rent_send_1501.php');
+require_once('rent_send_msgtunnel.php');
 
 Logger::configure('log4php_config.xml');
 $logging = Logger::getLogger('rent_sender');
@@ -83,7 +84,7 @@ function send_record()
 {
 	global $logging;
 	global $mysqli;
-	$sql = sprintf("select * from `wraith_rent_record` where deal_flag <> 2  and in_date > NOW()-interval 1 day");
+	$sql = sprintf("select * from `wraith_rent_record` where deal_flag in(0,1)  and in_date > NOW()-interval 1 day");
 	//$logging->info($sql);
 	$res = mysqli_query($mysqli, $sql);
 	if (!$res) {
@@ -95,7 +96,15 @@ function send_record()
 	{
 		//$logging->info("dealing request id:".$request['id']);
 		$send_func='send_to_destination_'.$request['trs_id'];
-		$send_func($request);		
+		if(function_exists($send_func))
+		{
+			$send_func($request);
+		}
+		else
+		{
+			$logging->info("function ".$send_func." doesn't exist!!!");
+			update_deal_flag($request, '11');
+		}
 	}
 }
 
