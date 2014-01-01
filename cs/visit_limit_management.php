@@ -2,25 +2,6 @@
 	include("check.php"); 
 	include("style.php");
 	
-	echo "<a href='visit_limit_management.php?cmd=3'>添加新规则</a>";
-	echo "<form name=load_config method=post action=".$_SERVER['PHP_SELF']."?load=1 >";
-	echo "<input type=submit name='submit' value='重新加载'  style='width:250px;height:500px;'>";
-	
-	
-	if(isset($_GET['load']))
-	{
-		$cmd = dirname(__FILE__)."/../controller/start_controller.sh";
-		//$cmd='python /home/sms/MsgTunnel/src/msgforward/config_maker.py';
-		//echo "cmd: ".$cmd."<br>";
-		exec($cmd, $output, $cmd_result);
-		if($cmd_result != 0)
-			echo "加载失败!<br>";
-					else
-						print_r($output[0]);
-						//var_dump($output);
-	 }
-	  	
-	  	
 	//add or modify
 	if(isset($_POST['province'])&&isset($_POST['product_id'])&&isset($_POST['daily_count'])&&isset($_POST['monthly_count']))
 	{
@@ -125,7 +106,7 @@
   $got_num=mysqli_num_rows($result);
   ////////
   //echo "result:$got_num<br>";
-
+  echo "<a href='visit_limit_management.php?cmd=3'>添加新规则</a>";
 	
   echo "<table>";
   echo "<tr bgcolor=#645375>
@@ -154,11 +135,28 @@
    echo "</table>";
    echo "<br>";
 	
-
-	echo "</form>";
-	echo "</body>";
 	
-
-
-
+	echo "</body>";	
 ?>
+
+
+<form name=load_config method=post action=visit_limit_management.php?load=1 >
+<input type=submit name='submit' value='重新加载'  style="width:250px;height:500px;">
+</form>
+</body>
+
+
+<?php
+
+if(isset($_GET['load']))
+{
+	$cmd = dirname(__FILE__)."/../controller/start_controller.sh";
+	//$cmd='python /home/sms/MsgTunnel/src/msgforward/config_maker.py';
+	//echo "cmd: ".$cmd."<br>";
+	exec($cmd, $output, $result);
+	if($result != 0)
+		echo "加载失败!<br>";
+	else
+		print_r($output[0]);
+	//var_dump($output);
+}
