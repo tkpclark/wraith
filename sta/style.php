@@ -1,4 +1,3 @@
-        <title>数据查询</title>
         <style type="text/css"> 
 		body {background-color: #fffff; color: #000000;}
 		body, td, th, h1, h2 {font-family: "ËÎÌå";font-size:12px;}

@@ -31,7 +31,7 @@ $mt_mode = $_REQUEST['mt_mode'];
 
 //$status=strpos($record->{'allow_province'},$record->{'province'})===false?2:0;
 $status=0;//it's useless
-$sql = sprintf("insert into wraith_rent_record(in_date,phone_number,linkid,message,sp_number,province,area,deal_flag,trs_id,mt_mode,gwid,amount,product_id,product_code,mt_message) values(NOW(),'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')",
+$sql = sprintf("insert into wraith_rent_record(in_date,phone_number,linkid,message,sp_number,province,area,deal_flag,trs_id,mt_mode,gwid,amount,product_id,product_code,mt_message,product_seq) values(NOW(),'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')",
 		$record->{'phone_number'},
 		$record->{'linkid'},
 		$record->{'message'},
@@ -45,7 +45,8 @@ $sql = sprintf("insert into wraith_rent_record(in_date,phone_number,linkid,messa
 		$record->{'amount'},
 		$record->{'product_id'},
 		$record->{'product_code'},
-		$record->{'default_msg'}
+		$record->{'default_msg'},
+		$record->{'product_seq'}
 		
 	);
 $logging->info($sql);

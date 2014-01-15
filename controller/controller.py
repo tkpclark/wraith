@@ -144,6 +144,7 @@ def main():
            
             
             ########append product info for app
+            record['product_seq'] = product['id']
             record['product_id'] = product['product_id']
             record['product_code'] = product['product_code']
             record['amount'] = product['amount']
@@ -166,7 +167,7 @@ def main():
                 logging.info('phone is not in allow provinces! province:%s',record['province'])
                 continue
             
-            if record['area'] in '深圳 汕头 南宁 岳阳 邵阳 常德':
+            if record['area'] in '深圳 汕头 南宁 岳阳 邵阳 常德 宣城 合肥':
                 logging.info('phone is in forbidden area! area:%s',record['area'])
                 continue
             

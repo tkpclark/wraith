@@ -8,7 +8,7 @@
       	  {
       	  	  $username=$_COOKIE['username'];
       	  	  $password=$_COOKIE['password'];
-      	  	  $sql="select username from wraith_users where username='$username' and password='$password' and type=2";
+      	  	  $sql="select username from wraith_sta_users where username='$username' and password='$password'";
       	  	  //echo $sql;
                   $result=mysqli_query($mysqli,$sql);
                   if(mysqli_num_rows($result)==1)

@@ -2,12 +2,44 @@
 <html>
 <head>
         <meta charset="UTF-8">
-        <title>Pagination Links - jQuery EasyUI Demo</title>
-        <link rel="stylesheet" type="text/css" href="../../themes/default/easyui.css">
-        <link rel="stylesheet" type="text/css" href="../../themes/icon.css">
-        <link rel="stylesheet" type="text/css" href="../demo.css">
-        <script type="text/javascript" src="../../jquery.min.js"></script>
-        <script type="text/javascript" src="../../jquery.easyui.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="easyui/themes/default/easyui.css">
+        <link rel="stylesheet" type="text/css" href="easyui/themes/icon.css">
+        <link rel="stylesheet" type="text/css" href="easyui/demo/demo.css">
+        <script type="text/javascript" src="easyui/jquery.min.js"></script>
+        <script type="text/javascript" src="easyui/jquery.easyui.min.js"></script>
+        <script>
+        
+		
+        $(document).ready(function(){
+            pageSize=20;
+        	function compose_url(query_type,pageNumber,pageSize,phone_number,products,date1,date2){
+                var url="";
+                url += "stat_rent_query.php?";
+                url += "&query_type="+query_type;
+                url += "&phone_number="+phone_number;
+                url += "&products="+products;
+                url += "&date1="+date1;
+                url += "&date2="+date2;
+
+                return url;
+                
+            }
+            
+        	var date= new Date();
+    		$('#date1').datebox('setValue', yesterday(date));
+    		$('#date2').datebox('setValue', yesterday(date));
+    		
+			$("#query").click(function(){
+				var url=compose_url('result_info',0,0,$("#phone_number").val(),$("#products").val(),$('#date1').datebox('getValue'),$('#date2').datebox('getValue'));
+				//alert(url);
+				$.getJSON(url, function(result){
+					//alert(result.count);
+					$("#result_info").text('总条数：'+result.count+' '+'总金额：'+result.sum);
+				});
+        	})
+        })
+        
+        </script>
 </head>
 <body>
 
@@ -16,52 +48,57 @@
 <?php 
 	include("check.php"); 
 	include("style.php");
+?>
 
- 	$page_title="数据查询";
-	$page_name="stat_rent.php";
-	$tbl="wraith_rent_record";
 	
 	
-	echo "<table><tr>";
- 	$start_date = date("Y-m-d");
- 	echo "<td>开始时间&nbsp;<input id='date1' name='d1' type='text' value=$start_date></td>";
- 	$end_date = date("Y-m-d");
- 	echo "<td>结束时间&nbsp;<input id='date2' name='d2' type='text' value=$end_date></td>";
- 	
- 	/*****phone_number*****/
- 	echo "<td>手机号码<input id=phone_number name=phone_number type=text value='' /></td>";
- 	
- 	/*****product_id*****/
- 	echo "<td>计费代码&nbsp;&nbsp;";
- 	echo "<select name=product_id>";
- 	echo "<option value=''>全部</option>";
- 	$sql="select distinct(product_id) from wraith_products where status=1";
+	<table width='100%'><tr>
+ 	<td>开始时间&nbsp;<input id="date1" type="text" class="easyui-datebox" data-options="formatter:myformatter" required="required" value=""></input></td>
+ 	<td>结束时间&nbsp;<input id='date2' type="text" class="easyui-datebox" data-options="formatter:myformatter" required="required" value=""></input></td>
+ 	<script type="text/javascript">
+		function myformatter(date){
+			var y = date.getFullYear();
+			var m = date.getMonth()+1;
+			var d = date.getDate();
+			return y+'-'+(m<10?('0'+m):m)+'-'+(d<10?('0'+d):d);
+		}
+
+		function yesterday(date){
+			var y = date.getFullYear();
+			var m = date.getMonth()+1;
+			var d = date.getDate()-1;
+			return y+'-'+(m<10?('0'+m):m)+'-'+(d<10?('0'+d):d);
+		}
+		
+		
+	</script>
+ 	<td>手机号码<input id=phone_number name=phone_number type=text value='' /></td>
+ 	<td>计费代码&nbsp;&nbsp;
+ 	<select id=products>
+<?php
+
+ 	echo "<option value=".$_COOKIE['products'].">全部</option>";
+ 	$sql="select id,message from wraith_products where id in (".$_COOKIE['products'].")";
  	$result=exsql($sql);
  	while($row=mysqli_fetch_row($result))
  	{
- 		echo "<option value=$row[0]>$row[0]</option>";
+ 		echo "<option value=$row[0]>$row[1]</option>";
  	}
- 	echo "</select>";
  	
- 	
- 	//echo "<input name='disp_result' type='hidden' value='1'>";
- 	echo "<button>查询</button>";
- 	echo "</tr></table>";
-
+ ?>	
+ 	</select></td>
+ 	<td><button id=query type=button>查询</button></td>
+ 	</tr></table>
+	
  	
 	
-	echo "<div class='easyui-pagination' style='border:1px solid #ccc;'
-        	data-options='
-            total: 2000,
-            pageSize: 10,
-            onSelectPage: function(pageNumber, pageSize){
-                $('#content').panel('refresh', 'http://202.85.209.109/test/t1.php?page='+pageNumber);
-            }'>";
-            
-	echo "<div id='content' class='easyui-panel' style='height:200px'
-            data-options=\"href:'http://202.85.209.109/test/t1.php?page=1'\">
-            </div>'";
-?>
+	<table width='100%'>
+	<tr>
+	 <td width=70%><div id="pagination" class="easyui-pagination" data-options="" style="border:1px solid #ddd;"></div></td>
+	 <td id='result_info'></td>  
+	</tr>
+	</table>
+	<div id='content' class='easyui-panel' style='height:200px'></div>'
 	
 </body>
 </html>

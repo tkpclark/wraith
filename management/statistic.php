@@ -293,8 +293,8 @@
 		exsql("set names utf8");
 		$result=exsql($sql);	
 			
-		echo $sql."&nbsp;";
-		echo "result:".mysqli_num_rows($result)."<br>";
+		//echo $sql."&nbsp;";
+		//echo "result:".mysqli_num_rows($result)."<br>";
 		$i=0;
 		
 		$sum=0;//总条数
