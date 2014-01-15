@@ -12,7 +12,8 @@
 		
         $(document).ready(function(){
             pageSize=20;
-        	function compose_url(query_type,pageNumber){
+
+            function compose_url(query_type,pageNumber,pageSize){
                 var url="";
                 url += "stat_rent_query.php?";
                 url += "&query_type="+query_type;
@@ -26,7 +27,22 @@
                 return url;
                 
             }
+
+
             
+            $('#pagination').pagination({
+                pageSize:pageSize,
+            	onSelectPage:function(pageNumber, pageSize){
+                	/*
+            		$(this).pagination('loading');
+            		alert('pageNumber:'+pageNumber+',pageSize:'+pageSize);
+            		$(this).pagination('loaded');
+            		*/
+            		$('#result_records').panel('refresh',compose_url('result_page',pageNumber,pageSize));
+            	}
+            });
+        		
+            //$('#result_records').panel('refresh',compose_url('result_page',pageNumber,pageSize));
         	var date= new Date();
     		$('#date1').datebox('setValue', yesterday(date));
     		$('#date2').datebox('setValue', yesterday(date));
@@ -35,7 +51,12 @@
 				$.getJSON(compose_url('result_info',0), function(result){
 					//alert(result.count);
 					$("#result_info").text('总条数：'+result.count+' '+'总金额：'+result.sum);
-					$('#result_records').panel('refresh',compose_url('result_page',1));
+
+					$('#pagination').pagination('refresh',{	// change options and refresh pager bar information
+						total: result.count
+					});
+
+					$('#result_records').panel('refresh',compose_url('result_page',1,pageSize));
 				});
         	})
         })
@@ -99,7 +120,7 @@
 	 <td id='result_info'></td>  
 	</tr>
 	</table>
-	<div id='result_records' class='easyui-panel' style='height:200px'></div>'
+	<div id='result_records' class='easyui-panel' style='height:500px'></div>'
 	
 </body>
 </html>

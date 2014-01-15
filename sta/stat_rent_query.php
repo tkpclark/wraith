@@ -50,7 +50,7 @@
 				<th>ID</th>
 				<th>手机号码</th>
 				<th>时间</th>
-				<th>产品</th>
+				<th>指令</th>
 				<th>省份</th>
 				<th>地区</th>
 				<th>金额</th>
