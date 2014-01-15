@@ -12,14 +12,16 @@
 		
         $(document).ready(function(){
             pageSize=20;
-        	function compose_url(query_type,pageNumber,pageSize,phone_number,products,date1,date2){
+        	function compose_url(query_type,pageNumber){
                 var url="";
                 url += "stat_rent_query.php?";
                 url += "&query_type="+query_type;
-                url += "&phone_number="+phone_number;
-                url += "&products="+products;
-                url += "&date1="+date1;
-                url += "&date2="+date2;
+                url += "&phone_number="+$("#phone_number").val();
+                url += "&products="+$("#products").val();
+                url += "&date1="+$('#date1').datebox('getValue');
+                url += "&date2="+$('#date2').datebox('getValue');
+                url += "&pageSize="+pageSize;
+                url += "&pageNumber="+pageNumber;
 
                 return url;
                 
@@ -30,11 +32,10 @@
     		$('#date2').datebox('setValue', yesterday(date));
     		
 			$("#query").click(function(){
-				var url=compose_url('result_info',0,0,$("#phone_number").val(),$("#products").val(),$('#date1').datebox('getValue'),$('#date2').datebox('getValue'));
-				//alert(url);
-				$.getJSON(url, function(result){
+				$.getJSON(compose_url('result_info',0), function(result){
 					//alert(result.count);
 					$("#result_info").text('总条数：'+result.count+' '+'总金额：'+result.sum);
+					$('#result_records').panel('refresh',compose_url('result_page',1));
 				});
         	})
         })
@@ -98,7 +99,7 @@
 	 <td id='result_info'></td>  
 	</tr>
 	</table>
-	<div id='content' class='easyui-panel' style='height:200px'></div>'
+	<div id='result_records' class='easyui-panel' style='height:200px'></div>'
 	
 </body>
 </html>

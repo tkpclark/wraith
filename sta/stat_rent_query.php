@@ -43,3 +43,42 @@
 		exit;
 		
 	}
+	if($query_type=='result_page')
+	{
+		echo "<table width=100%>";
+		echo "<tr>
+				<th>ID</th>
+				<th>手机号码</th>
+				<th>时间</th>
+				<th>产品</th>
+				<th>省份</th>
+				<th>地区</th>
+				<th>金额</th>
+				</tr>";
+		
+		$sql="select id,phone_number,in_date,message,province,area,amount from $tbl ";
+		$sql.=$sql_condition;
+		$sql.=" order by id desc";
+		$sql.=" limit ".$_REQUEST['pageSize']*($_REQUEST['pageNumber']-1).",".$_REQUEST['pageSize'];
+		//echo $sql;
+		mysqli_query($mysqli,"set names utf8");
+		if($result=mysqli_query($mysqli,$sql))
+		{
+			while($row=mysqli_fetch_assoc($result))
+			{
+				echo "<tr align='center'>";
+				echo "<td>".$row['id']."</td>";
+				echo "<td>".$row['phone_number']."</td>";
+				echo "<td>".$row['in_date']."</td>";
+				echo "<td>".$row['message']."</td>";
+				echo "<td>".$row['province']."</td>";
+				echo "<td>".$row['area']."</td>";
+				echo "<td>".$row['amount']."</td>";
+				echo "</tr>";
+			}
+			mysqli_free_result($result);
+		}
+		echo "</table>";
+		
+		
+	}
