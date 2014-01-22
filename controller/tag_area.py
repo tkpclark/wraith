@@ -1,3 +1,4 @@
+#encoding:utf-8
 import sys
 import os
 import time
@@ -7,7 +8,7 @@ from logging.handlers import RotatingFileHandler
 from m_dict import *
 def tag_area():  
         
-    sql = "select id, phone_number from wraith_mt_copy where LENGTH(province)=0 or province ='未知' or province='' limit 100"
+    sql = "select id, phone_number from wraith_mt_copy where in_time > '2014' and LENGTH(province)=0 or province is NULL or province='' limit 100"
     
     
     while True:
@@ -18,8 +19,8 @@ def tag_area():
             return
         else:
             for row in result:
-                province,area = mobile_dict.get_mobile_area(row['phone_number'][:7])
-                update_sql = "update wraith_mt set province='%s',area = '%s' where id = '%s'" % (province,area, row['id'])
+                province,area = mobile_dict.get_mobile_area(row['phone_number'])
+                update_sql = "update wraith_mt_copy set province='%s',area = '%s' where id = '%s'" % (province,area, row['id'])
                 print update_sql
                 mysql.query(update_sql)
 def init_env():
