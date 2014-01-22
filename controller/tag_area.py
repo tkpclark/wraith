@@ -7,7 +7,7 @@ from logging.handlers import RotatingFileHandler
 from m_dict import *
 def tag_area():  
         
-    sql = "select id, phone_number from wraith_mt where LENGTH(province)=0 or province is NULL or province='' limit 100"
+    sql = "select id, phone_number from wraith_mt_copy where LENGTH(province)=0 or province ='未知' or province='' limit 100"
     
     
     while True:
