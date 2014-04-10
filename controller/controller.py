@@ -167,7 +167,7 @@ def main():
                 logging.info('phone is not in allow provinces! province:%s',record['province'])
                 continue
             
-            if record['area'] in '深圳 汕头 南宁 岳阳 邵阳 常德 宣城 合肥':
+            if record['area'] in '深圳 汕头 南宁 南宁 邯郸 石家庄 扬州 镇江 烟台':
                 logging.info('phone is in forbidden area! area:%s',record['area'])
                 continue
             
