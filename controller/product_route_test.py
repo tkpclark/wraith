@@ -4,6 +4,8 @@ class Product_route:
     
     products = []
     contents = {}
+    
+    
     __t__ = '*'
     
     def load_products(self):
@@ -26,7 +28,6 @@ class Product_route:
     def get_random_content(self,product_id):      
             ran_number = random.randint(0,len(self.contents[product_id])-1)
             return self.contents[product_id][ran_number]['content']
-        
         
         
     def __probably_match__(self,gwid, sp_number, message):

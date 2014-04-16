@@ -8,7 +8,7 @@ import urllib2
 import logging
 from logging.handlers import RotatingFileHandler
 import json
-from product_route import *
+from product_route_test import *
 from m_dict import *
 from blklist import *
 from visit_limit import *
@@ -28,43 +28,12 @@ class MoData:
         else:
             print("not digtal in %s"%(self.__seq_file__))
             sys.exit(1)
-    def set_deal_pos(self, id):
-        f = open(self.__seq_file__,'w+')
-        f.write(id)
-        f.close()
+
     def read_data(self):
-        sql = "select * from wraith_mo where id > '%s' limit 1"%(self.get_deal_pos())
+        sql = "select * from wraith_mo order by id desc limit 1"
         data = mysql.queryAll(sql);
         return data
     
-def exec_app(appurl):
-    opener = urllib2.build_opener()
-    try:
-        file = opener.open(appurl)
-        resp = file.read()
-        return True
-    except:
-        logging.info("failed:"+appurl)
-        return False
-   
-''' 
-def check_phone_visit_count(phone_number):
-    now = datetime.datetime.now()
-    day = now.strftime('%Y-%m-%d')
-    month = now.strftime('%Y-%m')
-    
-    ##look whether reach day_max
-    sql = "select visit_count from wraith_visit_count where phone_number='%s' and visit_date='%s'"%(phone_number,day)
-    logging.info(sql);
-    data = mysql.queryAll(sql);
-    if(mysql.rowcount()==0):
-       sql = "insert into wraith_visit_count (phone_number, visit_date, visit_count) values('%s','%s','1')"%(phone_number, day)
-       mysql.queryAll(sql)
-    else:
-        if(print data[0]['visit_count']>
-    ##look whether reach month max
-''' 
-
 
     
 def init_env():
@@ -73,7 +42,7 @@ def init_env():
     os.chdir(sys.path[0])
     
     #init logging
-    logfile = '/home/app/wraith/logs/controller/controller.log'
+    logfile = '/home/app/wraith/logs/controller/controller_test.log'
     Rthandler = RotatingFileHandler(logfile, maxBytes=10*1024*1024,backupCount=5)
     formatter = logging.Formatter('[%(asctime)s][%(levelname)s][1.00]:  %(message)s - %(filename)s:%(lineno)d')
     Rthandler.setFormatter(formatter)
@@ -113,8 +82,6 @@ def main():
         for record in data:
             ########logging.debug(json.dumps(record))
             logging.info(record)
-            mo_data.set_deal_pos(record['id'])
-            
             
             ########linkisok?
             if(record['linkid'].isdigit() == False):
@@ -142,27 +109,17 @@ def main():
             logging.info('match product:' + product['id'])
             
            
-            
             ########append product info for app
             record['product_seq'] = product['id']
             record['product_id'] = product['product_id']
             record['product_code'] = product['product_code']
             record['amount'] = product['amount']
             record['province'],record['area'] = mobile_dict.get_mobile_area(record['phone_number'])
-            #record['default_msg']=product['default_msg']
             record['default_msg']=product_route.get_random_content(product['id'])
             record['allow_province']=product['allow_province']
             
-            
-            
-            ########check visit count 
-            limit_flag = visit_limit.is_arrive_limit(record['phone_number'],product['id'],record['province'],record['gwid'])
-            if(limit_flag > 0):
-                logging.info('visit limit! phone_number:%s, pid:%s, product_id:%s, gwid:%s, limit flag:%d',record['phone_number'],record['id'],record['product_id'],record['gwid'],limit_flag)
-                continue
-            
-            
-            
+            print record['default_msg']
+                 
             ########check allow province  
             if record['province'] not in record['allow_province']:
                 logging.info('phone is not in allow provinces! province:%s',record['province'])
@@ -173,16 +130,9 @@ def main():
                 continue
             
             
-           
-            ########
-            ########
-            ########all check is ok,do it!
-            app_url = product['url'] + 'record=' + urllib.quote_plus(json.dumps(record))
-            logging.info(app_url)
-            if(exec_app(app_url) == False):
-                logging.fatal('failed to visit [%s]', app_url)
+            logging.info(record['area'])
                     
-                
+            sys.exit()
             
             
             #time.sleep(10)

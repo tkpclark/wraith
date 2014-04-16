@@ -7,6 +7,7 @@ session_start();
 function get_all($sql,$result_type = MYSQL_ASSOC) {
 	global $mysqli;
 	//echo $sql;
+	mysqli_query($mysqli,"set names utf8");
 	$query = mysqli_query($mysqli,$sql) ;
 	$i = 0;
 	$rt = array();
@@ -29,6 +30,7 @@ if(@$_POST['originator'] == $a ){
 		$content = trim($_POST['text']);
 		
 		$sql = "insert into wraith_products_contents(pid,content) values($pid,'$content')";;
+		mysqli_query($mysqli,"set names utf8");
 		if(!mysqli_query($mysqli,$sql)) echo "<script>alert('添加失败')</script>";
 	}
 }
@@ -37,6 +39,7 @@ if(isset($_GET['pid']) && !empty($_GET['content'])){
 	$content = trim($_GET['content']);
 	
 	$sql = "update wraith_products_contents set content='$content' where id='$pid'";;
+	mysqli_query($mysqli,"set names utf8");
 	if(!mysqli_query($mysqli,$sql)) echo "<script>alert('修改失败')</script>";
 }
 $result = get_all("select id,sp_number,message from wraith_products");
