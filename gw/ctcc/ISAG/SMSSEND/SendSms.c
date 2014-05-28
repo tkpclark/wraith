@@ -17,7 +17,7 @@
 	
 char mdname[32]="sendsms";
 char logpath[256];
-char version[]="1.00";
+char version[]="1.02";
 static int quit;
 static int prtpid;
 static int rcdlen;
@@ -313,7 +313,12 @@ main()
 		if(quit)
 			exit(0);
 		alarm(200);
-		myflock(lockfd,1);
+		if(flock(lockfd,LOCK_EX))
+		{
+			proclog("lock error! %s",strerror(errno));
+		    	sleep(1);
+		    	continue;
+		}
 		if(!*(unsigned int*)(p_map+2*sizeof(unsigned int)))
 		{
 			myflock(lockfd,2);
@@ -324,6 +329,7 @@ main()
 			sleep(60);
 			continue;
 		}
+		proclog("mmap old:[%d][%d][%d]\n",*(unsigned int*)(p_map),(*(unsigned int*)(p_map+sizeof(unsigned int))),(*(unsigned int*)(p_map+2*sizeof(unsigned int))));
 		curnum=*(unsigned int*)(p_map+sizeof(unsigned int));
 		leftnum=*(unsigned int*)(p_map+2*sizeof(unsigned int));
 		memcpy(p_chd,p_map+512+curnum*rcdlen,rcdlen);
@@ -331,8 +337,11 @@ main()
 		*(unsigned int*)(p_map)+=1;
 		(*(unsigned int*)(p_map+sizeof(unsigned int)))+=1;
 		(*(unsigned int*)(p_map+2*sizeof(unsigned int)))-=1;
-	
-		myflock(lockfd,2);
+		proclog("mmap new:[%d][%d][%d]\n",*(unsigned int*)(p_map),(*(unsigned int*)(p_map+sizeof(unsigned int))),(*(unsigned int*)(p_map+2*sizeof(unsigned int))));
+		if(flock(lockfd,LOCK_UN))
+		{
+			proclog("unlock error! %s",strerror(errno));
+		}
 		if(leftnum==1)
 		{
 			kill(prtpid,SIGUSR1);

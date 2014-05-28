@@ -5,7 +5,7 @@
 	
 	
 	/***********condition***********/
-	$sql_condition="where 1 ";
+	$sql_condition="where 1  ";
 	if(isset($_REQUEST["query_type"]))
 	{
 		$query_type=$_REQUEST["query_type"];
@@ -34,7 +34,7 @@
 	if($query_type=='result_info')
 	{
 		$sql="select count(amount) as count,ifnull(ceil(sum(amount)/100),0) as sum from $tbl  ";
-		$sql.=$sql_condition;
+		$sql.=$sql_condition." and report='ok'";
 		//echo $sql;
 		$result=mysqli_query($mysqli,$sql);
 		$row=mysqli_fetch_assoc($result);
@@ -54,9 +54,10 @@
 				<th>省份</th>
 				<th>地区</th>
 				<th>金额</th>
+				<th>状态</th>
 				</tr>";
 		
-		$sql="select id,phone_number,in_date,message,province,area,amount from $tbl ";
+		$sql="select id,phone_number,in_date,message,province,area,amount,report from $tbl ";
 		$sql.=$sql_condition;
 		$sql.=" order by id desc";
 		$sql.=" limit ".$_REQUEST['pageSize']*($_REQUEST['pageNumber']-1).",".$_REQUEST['pageSize'];
@@ -74,6 +75,7 @@
 				echo "<td>".$row['province']."</td>";
 				echo "<td>".$row['area']."</td>";
 				echo "<td>".$row['amount']."</td>";
+				echo "<td>".$row['report']."</td>";
 				echo "</tr>";
 			}
 			mysqli_free_result($result);

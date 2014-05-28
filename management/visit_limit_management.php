@@ -5,7 +5,7 @@
 	echo "<a href='visit_limit_management.php?cmd=3'>添加新规则</a>";
 	echo "<form name=load_config method=post action=".$_SERVER['PHP_SELF']."?load=1 >";
 	echo "<input type=submit name='submit' value='重新加载'  style='width:250px;height:500px;'>";
-	
+	echo "</form>";
 	
 	if(isset($_GET['load']))
 	{
@@ -20,7 +20,6 @@
 						//var_dump($output);
 	 }
 	  	
-	  	
 	//add or modify
 	if(isset($_POST['province'])&&isset($_POST['product_id'])&&isset($_POST['daily_count'])&&isset($_POST['monthly_count']))
 	{
@@ -29,7 +28,8 @@
 		$daily_count=$_POST['daily_count'];
 		$monthly_count=$_POST['monthly_count'];
 		
-		if($_GET['type']=="insert")
+		//echo $_SERVER['REQUEST_URI'];
+		if($_REQUEST['type']=="insert")
 		{
 			$sql="set names utf8";
 			exsql($sql);
@@ -40,7 +40,7 @@
 			//echo $sql;
 			exsql($sql);
 		}
-		else if($_GET['type']=="update")
+		else if($_REQUEST['type']=="update")
 		{
 			$sql="set names utf8";
 			mysqli_query($mysqli,$sql) or die (mysqli_error());
@@ -77,7 +77,7 @@
 			else
 			{
 				$row=[];
-				echo "<form action=visit_limit_management.php?type=insert method=POST>";
+				echo "<form action='visit_limit_management.php?type=insert' method='POST'>";
 			}
 				
 				
@@ -155,7 +155,6 @@
    echo "<br>";
 	
 
-	echo "</form>";
 	echo "</body>";
 	
 

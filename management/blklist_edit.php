@@ -18,7 +18,7 @@
 <td>批量添加</td>
 <td>
 <form ENCTYPE="multipart/form-data" ACTION="blklist_edit.php" METHOD="POST">
-<input type="hidden" name="MAX_FILE_SIZE"  value="1000">
+<input type="hidden" name="MAX_FILE_SIZE"  value="10000000">
 请选取文件:  
 <input NAME="userfile" TYPE="file">
 <input TYPE="submit" VALUE="Send File">
@@ -37,7 +37,7 @@ if(!isset($_FILES['userfile']))
 	exit;
 $first_file = $_FILES['userfile'];  //获取文件1的信息
 
-$upload_dir = '/tmp/'; //保存上传文件的目录
+$upload_dir = '/tmp/upload'; //保存上传文件的目录
 
 //处理上传的文件1
 if ($first_file['error'] == UPLOAD_ERR_OK){
@@ -49,7 +49,35 @@ if ($first_file['error'] == UPLOAD_ERR_OK){
     move_uploaded_file($temp_name, $upload_dir.$file_name);
     echo '上传成功!  开始导入...<br/><br/><br/>';
 }else{
-    echo '上传失败!<br/>';
+	
+	echo "失败！ 原因：";
+    switch($first_file['error']) {
+
+    
+	case 1:
+		echo "文件大小超出了服务器的空间大小";
+		break;
+
+	case 2:
+		echo "要上传的文件大小超出浏览器限制";
+		break;
+		 
+	case 3:
+		echo "文件仅部分被上传";
+		break;
+		 
+	case 4:
+		echo "没有找到要上传的文件";
+		break;
+		 
+	case 5:
+		echo "服务器临时文件夹丢失";
+		break;
+		 
+	case 6:
+		echo "文件写入到临时文件夹出错";
+		break;
+}
     exit;
 }
 
@@ -59,10 +87,10 @@ while (!feof($file_handle)) {
 	$line = trim(fgets($file_handle));
 	if($line=='')
 		continue;
-	if(is_numeric($line) && strlen($line)==11)
+	if(1)
 	{
 		
-		echo "格式正确!<br>";
+		//echo "格式正确!<br>";
 		$sql=sprintf("insert into wraith_blklist(phone_number) values('%s')",$line);
 		//echo $sql;
 		exsql($sql);
@@ -70,8 +98,9 @@ while (!feof($file_handle)) {
 	}
 	else
 	{
-		
-		echo "<font color='red'>".$line." 格式错误!</font><br>";
+		$a=strlen($line);
+		echo $a;
+		echo "<font color='red'>[".$line."] 格式错误!忽略</font><br>";
 	}
 		
 	

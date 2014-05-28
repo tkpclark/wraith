@@ -29,8 +29,9 @@ function ask(id)
 	 	echo "手机号码：<input type=\"text\" name=\"pn\">";
 	 	echo "<input type=submit name=submit value=查询>";
 	 	echo "</form>";
- 	
-
+	 	
+	 	
+	 	
 		$sql="select count(*) from $tbl
 				where phone_number like '%$pn%'";
 
@@ -40,6 +41,8 @@ function ask(id)
 	$total_num=$row[0];
 	$total_pg_num=ceil($total_num/$pg_lmt);
 	echo "您查询的条件为[*$pn*],共有[$total_num]条记录&nbsp;&nbsp;&nbsp;";
+	  	
+	  	
 	if($total_num==0)
 		exit;
 		
@@ -99,6 +102,20 @@ function ask(id)
    echo "</table>";
   
    echo "<br>";
+   echo "<form name=load_config method=post action=".$_SERVER['PHP_SELF']."?load=1 >";
+   echo "<input type=submit name='submit' value='重新加载'  style='width:250px;height:500px;'>";
+   if(isset($_GET['load']))
+   {
+   	$cmd = dirname(__FILE__)."/../controller/start_controller.sh";
+   	//$cmd='python /home/sms/MsgTunnel/src/msgforward/config_maker.py';
+   	//echo "cmd: ".$cmd."<br>";
+   	exec($cmd, $output, $cmd_result);
+   	if($cmd_result != 0)
+   		echo "加载失败!<br>";
+   				else
+   					print_r($output[0]);
+   					//var_dump($output);
+   }
    echo "</body>";
    
 ?>

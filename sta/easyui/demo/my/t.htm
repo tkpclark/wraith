@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Pagination Links - jQuery EasyUI Demo</title>
+	<link rel="stylesheet" type="text/css" href="../../themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../../themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="../demo.css">
+	<script type="text/javascript" src="../../jquery.min.js"></script>
+	<script type="text/javascript" src="../../jquery.easyui.min.js"></script>
+</head>
+<body>
+<div id="content" class="easyui-panel" style="height:200px"
+        data-options="href:'http://202.85.209.109/test/t1.php?page=1'">
+</div>
+<div class="easyui-pagination" style="border:1px solid #ccc;"
+        data-options="
+            total: 2000,
+            pageSize: 10,
+            onSelectPage: function(pageNumber, pageSize){
+                $('#content').panel('refresh', 'http://202.85.209.109/test/t1.php?page='+pageNumber);
+            }">
+</div>
+</body>
+</html>
